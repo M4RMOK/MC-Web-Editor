@@ -1,0 +1,40 @@
+html, body {
+	overflow: auto;
+}
+body {
+	background-color: #222;
+	color: #fff;
+}
+
+h3 {
+	text-align: center;
+	font: Berlin Sans FB Demi;
+	font-size: xx-large;
+}
+
+#salida {
+	width: 70%;
+	height: 30%;
+}
+#estado {
+	width: 80%;
+	height: 50%;
+	color: red;
+	font-weight: bold; 
+	border-style: none none solid none;
+	
+	border-color: rgb(41, 169, 201);
+}
+
+div.select-fill {
+	padding-left: 5px;
+	padding-right: 5px;
+}
+
+label.subopt {
+	font-size: 12px;
+}
+
+#midi-monitor-table {
+	text-align: center;
+}
