@@ -157,8 +157,8 @@ function midiMessageReceived(midiMessage) {
 				$('select[name="debounce-time"]').val(presetData.shift());
 				$('select[name="lp-time"]').val(presetData.shift());
 				$('select[name="bankname-time"]').val(presetData.shift());
-				$('select[name="exp1"]').val(presetData.shift());
-				$('select[name="exp2"]').val(presetData.shift());
+				$('select[name="omni-port-conf-1"]').val(presetData.shift());
+				$('select[name="omni-port-conf-2"]').val(presetData.shift());
 				break;
 		}
 	} else {
@@ -626,8 +626,8 @@ $('#save_settings_button').on('click', function() {
 	final_hex.push($('select[name="debounce-time"]').val());
 	final_hex.push($('select[name="lp-time"]').val());
 	final_hex.push($('select[name="bankname-time"]').val());
-	final_hex.push($('select[name="exp1"]').val());
-	final_hex.push($('select[name="exp2"]').val());
+	final_hex.push($('select[name="omni-port-conf-1"]').val());
+	final_hex.push($('select[name="omni-port-conf-2"]').val());
 	final_hex.push(247);
 	sendBytes(final_hex);
 });
