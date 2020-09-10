@@ -38,3 +38,11 @@ label.subopt {
 #midi-monitor-table {
 	text-align: center;
 }
+
+label.color-label {
+	padding: 2px;
+	margin: 5px;
+	background-clip: content-box;
+	width: 26px;
+	height: 26px;
+}

@@ -96,9 +96,8 @@
                 <div class="col-sm-12">
                   <div style="margin-top:15px;">
                     <form>
-                      <div class="row">
-
-                        <div class="col-sm">
+                    <div class="row">
+                        <div class="col-sm-6">
                           <div class="form-group">
                             <div class="input-group">
                               <div class="input-group-prepend">
@@ -108,34 +107,56 @@
                             </div>
                           </div>
                         </div>
-                        <div class="col-sm-4">
+                      </div>
+                      <div class="row">
+                        <div class="col-sm-8">
                           <div class="form-group">
                             <div class="input-group">
                               <div  class="input-group-prepend">
-                                <span class="input-group-text" data-toggle="tooltip" title="Led color for position 1">Led color pos 1</span>
+                                <span class="input-group-text" data-toggle="tooltip" title="Led ring color">Led Ring Color</span>
                               </div>
-                              <input class="form-control" id="color1" name="color1" type="color" maxlength="8" style="touch-action: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
+                              <input class="form-control" id="color" name="color" type="hidden" value="0">
+                              <div style="margin-left: 10px;">
+                                <label class="btn color-label" style="background-color: black; border-color: white;"></label>
+                                <label class="btn color-label" style="background-color: red"></label>
+                                <label class="btn color-label" style="background-color: orange"></label>
+                                <label class="btn color-label" style="background-color: yellow"></label>
+                                <label class="btn color-label" style="background-color: limegreen"></label>
+                                <label class="btn color-label" style="background-color: blue"></label>
+                                <label class="btn color-label" style="background-color: deepskyblue"></label>
+                                <label class="btn color-label" style="background-color: purple"></label>
+                                <label class="btn color-label" style="background-color: white"></label>
+                                <label class="btn color-label" style="background-color: hotpink"></label>
+                                <label class="btn color-label" style="background-color: darkcyan"></label>
+                                <label class="btn color-label" style="background-color: greenyellow"></label>
+                              </div>
+
                             </div>
                           </div>
                         </div>
+                        
+                    </div>
+                    <div class="row">
                         <div class="col-sm-4">
                           <div class="form-group">
                             <div class="input-group">
                               <div class="input-group-prepend">
-                                <span class="input-group-text" data-toggle="tooltip" title="Led color for position 2">Led color pos 2</span>
+                                <span class="input-group-text" data-toggle="tooltip" title="Pos 1 Color Type">Pos 1 Color Type</span>
                               </div>
-                              <input class="form-control input-sm" id="color2" name="color2" type="color" maxlength="8" style="touch-action: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
+                              <select class="form-control input-sm" id="color-type">
+                                <option value="0"> Off </option>
+                                <option value="1"> Dimmer </option>
+                                </select>
                             </div>
                           </div>
                         </div>
-                      </div>
+                    </div>
                     </form>
                   </div>
                 </div>
               </div>
 
 
-              <!-- Colors -->
               <div class="row">
                 <div class="col-sm-12">
                   <form>

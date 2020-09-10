@@ -75,7 +75,34 @@ function midiMessageReceived(midiMessage) {
 				}
 
 				// Preset data
-				let presetType = presetData.shift();
+				let presetConf = presetData.shift();
+				let pToggleMode = (presetConf >> 5) & 0x01;
+				let pToogleModeButton = $('.toggle-mode-button').eq(0);
+				if (pToggleMode == 0) {
+					pToogleModeButton.data('toggle-mode', '0');
+					pToogleModeButton.text('Toggle Mode Off');
+					pToogleModeButton.css({color: 'white'});
+				} else if (pToggleMode == 1) {
+					pToogleModeButton.data('toggle-mode', '1');
+					pToogleModeButton.text('Toggle Mode On');
+					pToogleModeButton.css({color: 'yellow'});
+				} else {
+					pToogleModeButton.text('¡Error!');
+				}
+				let lpToogleModeButton = $('.toggle-mode-button').eq(1);
+				let lpToggleMode = (presetConf >> 6) & 0x01;
+				if (lpToggleMode == 0) {
+					lpToogleModeButton.data('toggle-mode', '0');
+					lpToogleModeButton.text('Toggle Mode Off');
+					lpToogleModeButton.css({color: 'white'});
+				} else if (lpToggleMode == 1) {
+					lpToogleModeButton.data('toggle-mode', '1');
+					lpToogleModeButton.text('Toggle Mode On');
+					lpToogleModeButton.css({color: 'yellow'});
+				} else {
+					pToogleModeButton.text('¡Error!');
+				}
+				let presetType = parseInt('11111', 2)&presetConf;
 				if (presetType == 0) {
 					$('#preset_type_button').data('preset-type', '0');
 					$('#preset_type_button').text('Preset Type: Preset');
@@ -91,46 +118,24 @@ function midiMessageReceived(midiMessage) {
 				$('#p_short_name').val(pShortName);
 				let pToggleName = intToAscii(presetData, 9);
 				$('#p_toggle_name').val(pToggleName);
-				let pToggleMode = presetData.shift();
-				let pToogleModeButton = $('.toggle-mode-button').eq(0);
-				if (pToggleMode == 0) {
-					pToogleModeButton.data('toggle-mode', '0');
-					pToogleModeButton.text('Toggle Mode Off');
-					pToogleModeButton.css({color: 'white'});
-				} else if (pToggleMode == 1) {
-					pToogleModeButton.data('toggle-mode', '1');
-					pToogleModeButton.text('Toggle Mode On');
-					pToogleModeButton.css({color: 'yellow'});
-				} else {
-					pToogleModeButton.text('¡Error!');
-				}
+				
 				let lpShortName = intToAscii(presetData, 9);
 				$('#lp_short_name').val(lpShortName);
 				let lpToggleName = intToAscii(presetData, 9);
 				$('#lp_toggle_name').val(lpToggleName);
-				let lpToggleMode = presetData.shift();
-				let lpToogleModeButton = $('.toggle-mode-button').eq(1);
-				if (lpToggleMode == 0) {
-					lpToogleModeButton.data('toggle-mode', '0');
-					lpToogleModeButton.text('Toggle Mode Off');
-					lpToogleModeButton.css({color: 'white'});
-				} else if (lpToggleMode == 1) {
-					lpToogleModeButton.data('toggle-mode', '1');
-					lpToogleModeButton.text('Toggle Mode On');
-					lpToogleModeButton.css({color: 'yellow'});
-				} else {
-					pToogleModeButton.text('¡Error!');
-				}
 
-				// Led colors
-				r1 = PadLeft(((presetData.shift())*2).toString(16), 2);
-				g1 = PadLeft(((presetData.shift())*2).toString(16), 2);
-				b1 = PadLeft(((presetData.shift())*2).toString(16), 2);
-				$('#color1').val('#'+r1+g1+b1);
-				r2 = PadLeft(((presetData.shift())*2).toString(16), 2);
-				g2 = PadLeft(((presetData.shift())*2).toString(16), 2);
-				b2 = PadLeft(((presetData.shift())*2).toString(16), 2);
-				$('#color2').val('#'+r2+g2+b2);
+				let colorVal = presetData.shift();
+				let ringColor = 0;
+				let colorType = 0;
+				if (colorVal >= 64) {
+					colorType = 1;
+					ringColor = colorVal-64;
+				} else {
+					ringColor = colorVal;
+				}
+				$('#color').val(ringColor);
+				$('label.color-label').eq(ringColor).trigger('click');
+				$('#color-type').val(colorType);
 
 				// Messages data
 				for(let i=0; i<n_messages; i++) {
@@ -498,6 +503,12 @@ $('#midi-monitor-tab').on('click', function() {
 	sendMIDIMonitorRequest();
 });
 
+$('label.color-label').on('click', function() {
+	$('label.color-label').css({'border-color': 'transparent'});
+	$(this).css({'border-color': 'white'});
+	$('#color').val($(this).index());
+});
+
 $('#save_preset_button').on('click', function() {
 	var final_hex = [];
 	final_hex.push(240);
@@ -505,22 +516,21 @@ $('#save_preset_button').on('click', function() {
 	final_hex.push(bankNumber);
 	final_hex.push(pageNumber);
 	final_hex.push(buttonNumber);
-	final_hex.push(parseInt($('#preset_type_button').data('preset-type')));
+	let presetConf = parseInt($('#preset_type_button').data('preset-type'));
+	if ($('.toggle-mode-button').eq(0).data('toggle-mode') == '1') {
+		presetConf |= 1 << 5;
+	}
+	if ($('.toggle-mode-button').eq(1).data('toggle-mode') == '1') {
+		presetConf |= 1 << 6;
+	}
+	final_hex.push(presetConf);
 	stringToAscii(final_hex, $('#long_name').val(), 25);
 	stringToAscii(final_hex, $('#p_short_name').val(), 9);
 	stringToAscii(final_hex, $('#p_toggle_name').val(), 9);
-	final_hex.push(parseInt($('.toggle-mode-button').eq(0).data('toggle-mode')));
 	stringToAscii(final_hex, $('#lp_short_name').val(), 9);
 	stringToAscii(final_hex, $('#lp_toggle_name').val(), 9);
-	final_hex.push(parseInt($('.toggle-mode-button').eq(1).data('toggle-mode')));
-	let color_val1 = $('#color1').val();
-	final_hex.push(Math.floor(parseInt(color_val1.substring(1,3),16))/2);
-	final_hex.push(Math.floor(parseInt(color_val1.substring(3,5),16))/2);
-	final_hex.push(Math.floor(parseInt(color_val1.substring(5,7),16))/2);
-	let color_val2 = $('#color2').val();
-	final_hex.push(Math.floor(parseInt(color_val2.substring(1,3),16))/2);
-	final_hex.push(Math.floor(parseInt(color_val2.substring(3,5),16))/2);
-	final_hex.push(Math.floor(parseInt(color_val2.substring(5,7),16))/2);
+	let color_val = (parseInt($('#color').val()) + ($('#color-type').val()*64));
+	final_hex.push(color_val);
 	$('div.msg').each(function() {
 		if ($(this).hasClass('msg-ok')) {
 			final_hex.push(parseInt($(this).find('select[name="action"]').val()));
