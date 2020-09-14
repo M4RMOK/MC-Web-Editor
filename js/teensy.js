@@ -40,7 +40,8 @@ function onMIDISuccess(midi) {
         $('#con_dis_button').removeClass('btn-primary');
         $('#con_dis_button').addClass('btn-success');
         $('#con_dis_button').text('Teensy MIDI');
-        sendPresetRequest();
+        sendEditModeRequest();
+        //sendPresetRequest();
     } else {
         alert("No Teensy MIDI found.");
     }
@@ -161,9 +162,11 @@ function midiMessageReceived(midiMessage) {
 			case 3:
 				$('select[name="debounce-time"]').val(presetData.shift());
 				$('select[name="lp-time"]').val(presetData.shift());
-				$('select[name="bankname-time"]').val(presetData.shift());
+				$('select[name="notification-time"]').val(presetData.shift());
 				$('select[name="omni-port-conf-1"]').val(presetData.shift());
 				$('select[name="omni-port-conf-2"]').val(presetData.shift());
+				$('select[name="ring-bright"]').val(presetData.shift());
+				$('select[name="ring-dim"]').val(presetData.shift());
 				break;
 		}
 	} else {
@@ -254,6 +257,16 @@ function sendBytes(bytes)
     console.log(bytes_to_send);
 
 	midiOut.send(bytes_to_send);
+}
+
+function sendEditModeRequest()
+{
+	var final_hex = [];
+	final_hex.push(240);
+	final_hex.push(8);
+	final_hex.push(0);
+	final_hex.push(247);
+	sendBytes(final_hex);
 }
 
 function sendPresetRequest()
@@ -635,9 +648,11 @@ $('#save_settings_button').on('click', function() {
 	final_hex.push(6);
 	final_hex.push($('select[name="debounce-time"]').val());
 	final_hex.push($('select[name="lp-time"]').val());
-	final_hex.push($('select[name="bankname-time"]').val());
+	final_hex.push($('select[name="notification-time"]').val());
 	final_hex.push($('select[name="omni-port-conf-1"]').val());
 	final_hex.push($('select[name="omni-port-conf-2"]').val());
+	final_hex.push($('select[name="ring-bright"]').val());
+	final_hex.push($('select[name="ring-dim"]').val());
 	final_hex.push(247);
 	sendBytes(final_hex);
 });
