@@ -163,10 +163,10 @@ function midiMessageReceived(midiMessage) {
 				$('select[name="debounce-time"]').val(presetData.shift());
 				$('select[name="lp-time"]').val(presetData.shift());
 				$('select[name="notification-time"]').val(presetData.shift());
-				$('select[name="omni-port-conf-1"]').val(presetData.shift());
-				$('select[name="omni-port-conf-2"]').val(presetData.shift());
 				$('select[name="ring-bright"]').val(presetData.shift());
 				$('select[name="ring-dim"]').val(presetData.shift());
+				$('select[name="omni-port-conf-1"]').val(presetData.shift());
+				$('select[name="omni-port-conf-2"]').val(presetData.shift());
 				break;
 		}
 	} else {
@@ -500,7 +500,7 @@ $('.toggle-mode-button').on('click', function() {
 });
 
 $('#edit-tab').on('click', function() {
-	sendPresetRequest();
+	//sendPresetRequest();
 });
 
 $('#bank-tab').on('click', function() {
@@ -649,10 +649,10 @@ $('#save_settings_button').on('click', function() {
 	final_hex.push($('select[name="debounce-time"]').val());
 	final_hex.push($('select[name="lp-time"]').val());
 	final_hex.push($('select[name="notification-time"]').val());
-	final_hex.push($('select[name="omni-port-conf-1"]').val());
-	final_hex.push($('select[name="omni-port-conf-2"]').val());
 	final_hex.push($('select[name="ring-bright"]').val());
 	final_hex.push($('select[name="ring-dim"]').val());
+	final_hex.push($('select[name="omni-port-conf-1"]').val());
+	final_hex.push($('select[name="omni-port-conf-2"]').val());
 	final_hex.push(247);
 	sendBytes(final_hex);
 });
