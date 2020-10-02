@@ -4,6 +4,7 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <link href="css/bootstrap-darkly.css" rel="stylesheet">
+    <title>AfterMoon Midi Editor</title>
   </head>
   <body>
     <div class="container-fluid">
@@ -67,6 +68,9 @@
             <li class="nav-item">
               <a class="nav-link" id="midi-monitor-tab" data-toggle="tab" href="#midi-monitor-div" role="tab">MIDI Monitor</a>
             </li>
+            <li class="nav-item">
+              <a class="nav-link" id="exp-pedal-tab" data-toggle="tab" href="#exp-pedal-div" role="tab" style="display: none;">Exp Pedal</a>
+            </li>
             <!-- Todo
             <li class="nav-item">
               <a class="nav-link disabled" href="#">MIDI Dictionary</a>
@@ -74,11 +78,12 @@
           </ul>
 
           <div class="tab-content" id="myTabContent">
+            <!-- Preset -->
             <div class="tab-pane fade show active" role="tabpanel" id="edit-div" aria-labelledby="edit-tab" style="margin-top: 10px;">
               <!-- Preset Options -->
               <div class="row">
                 <div class="btn-group btn-group-justified col-sm-12">
-                  <button class="btn btn-secondary" id="preset_type_button" data-preset-type="0" data-toggle="tooltip" title="If Toggle Mode is On, each press will alternate between Pos 1 and 2" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); color: white;">Preset Type: Preset
+                  <button class="btn btn-secondary" id="preset_type_button" data-preset-type="0" data-toggle="tooltip" title="Preset type for led behavior. Type preset or effect" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); color: white;">Preset Type: Preset
                   </button>
                   <button class="btn btn-secondary" data-toggle="tooltip" title="Copy the Preset" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Copy
                   </button>
@@ -550,8 +555,8 @@
               </div>
             </div>
 
+            <!-- Bank Options -->
             <div class="tab-pane fade" role="tabpanel" id="bank-div" aria-labelledby="bank-tab" style="margin-top: 10px;">
-              <!-- Bank Options -->
               <div class="row">
                 <div class="col-sm-8">
                   <div class="form-group">
@@ -567,12 +572,10 @@
                   <button class="btn btn-secondary col-sm-12" id="save_bank_button" data-toggle="tooltip" title="Save the current bank settings" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);"> Save Bank Settings </button>
                 </div>
               </div>
-
             </div>
 
-
+            <!-- Controller Settings -->
             <div class="tab-pane fade" role="tabpanel" id="settings-div" aria-labelledby="settings-tab" style="margin-top: 10px;">
-              <!-- Controller Settings -->
               <div class="row justify-content-center">
                 <div class="col-sm-4 text-center">
                   <button class="btn btn-secondary col-sm-12" id="save_settings_button" data-toggle="tooltip" title="Save the current controller settings" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);"> Save Controller Settings </button>
@@ -769,11 +772,10 @@
                   </div>
                 </div>
               </div>
-
             </div>
 
+            <!-- MIDI Monitor -->
             <div class="tab-pane fade" role="tabpanel" id="midi-monitor-div" aria-labelledby="midi-monitor-tab" style="margin-top: 10px;">
-              <!-- MIDI Monitor -->
               <div class="row">
                 <div class="col-sm-12">
                     <table class="table table-hover" id="midi-monitor-table">
@@ -791,7 +793,181 @@
                     </table>
                 </div>
               </div>
+            </div>
 
+            <!-- Expression Pedal -->
+            <div class="tab-pane fade" role="tabpanel" id="exp-pedal-div" aria-labelledby="exp-pedal-tab" style="margin-top: 10px;">
+              <!-- Preset Options -->
+              <div class="row">
+                <div class="btn-group btn-group-justified col-sm-12">
+                  <button class="btn btn-secondary disabled" data-preset-type="0" data-toggle="tooltip" title="If Toggle Mode is On, each press will alternate between Pos 1 and 2" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); color: white;">Preset Type: Preset
+                  </button>
+                  <button class="btn btn-secondary" data-toggle="tooltip" title="Copy the Preset" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Copy
+                  </button>
+                  <button class="btn btn-secondary" data-toggle="tooltip" title="Paste the last copied Preset to the current Preset" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Paste
+                  </button>
+                  <button class="btn btn-secondary" data-toggle="tooltip" title="Resets the Preset settings by double-clicking this button" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Clear
+                  </button>
+                  <button class="btn btn-secondary" id="save_exp_button" data-toggle="tooltip" title="Save Preset settings to the device" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Save Expression
+                  </button>
+                </div>
+              </div>
+
+              <!-- Exp Name -->
+              <div class="row">
+                <div class="col-sm-12">
+                  <div style="margin-top:15px;">
+                    <form>
+                      <div class="row">
+                        <div class="col-sm-6">
+                          <div class="form-group">
+                            <div class="input-group">
+                              <div class="input-group-prepend">
+                                <span class="input-group-text" data-toggle="tooltip" title="Expression Short Name">Short Name</span>
+                              </div>
+                              <input class="form-control input-sm" id="exp_short_name" name="expShortName" type="text" maxlength="8" style="touch-action: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </form>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-sm-12">
+                  <div style="margin-top:15px;">
+
+                    <!-- Mensajes -->
+                    <div class="exp-msg">
+                      <form>
+                        <div class="row" style="padding-left: 10px;padding-right: 10px;">
+                          <div class="col-sm-1 select-fill" style="white-space: nowrap">
+                            <button class="btn btn-secondary" type="button" style="color: white;">Msg 1</button>
+                          </div>
+                          <div class="col-sm-6 select-fill">
+                            <div class="form-group">
+                              <div class="input-group">
+                                <div class="input-group-prepend">
+                                  <span class="input-group-text" data-toggle="tooltip" title="Selects the message that will be invoked when the message is exeuted" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); color: white;">Type</span>
+                                </div>
+                                <select class="form-control input-sm" name="exp-type">
+                                  <optgroup label="Expression Message">
+                                    <option value="0"> Empty </option>
+                                    <option value="1"> Expression CC </option>
+                                    <option value="2"> CC Down </option>
+                                    <option value="3"> CC Up </option>
+                                  </optgroup>
+                                </select>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="col-sm-5 select-fill">
+                            <div class="row">
+                              <div class="btn-group btn-group-justified col-sm-12">
+                                <a class="btn btn-secondary exp-clear-button" data-toggle="tooltip" title="Clears the message settings with a double-click on this button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Clear</a>
+                                <a class="btn btn-secondary copy-button disabled" data-toggle="tooltip" title="Copy this message" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Copy</a>
+                                <a class="btn btn-secondary paste-button disabled" data-toggle="tooltip" title="Paste the last copied message to this message" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Paste</a>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+
+                        <div class="subopt subopt-1" style="display: none; padding-bottom: 18px;">
+                            <div class="row justify-content-center">
+                              <div class="col-sm-2">
+                                <div class="form-group">
+                                  <label class="subopt">CC Number</label>
+                                  <input type="number" class="is-valid form-control form-control-sm" name="ccnumber" value="0">
+                                  <div class="invalid-feedback">Must be 0 - 127</div>
+                                </div>
+                              </div>
+                              <div class="col-sm-2">
+                                <div class="form-group">
+                                  <label class="subopt">CC Min Value</label>
+                                  <input type="number" class="is-valid form-control form-control-sm" name="ccminvalue" value="0">
+                                  <div class="invalid-feedback">Must be 0 - 127</div>
+                                </div>
+                              </div>
+                              <div class="col-sm-2">
+                                <div class="form-group">
+                                  <label class="subopt">CC Max Value</label>
+                                  <input type="number" class="is-valid form-control form-control-sm" name="ccmaxvalue" value="0">
+                                  <div class="invalid-feedback">Must be 0 - 127</div>
+                                </div>
+                              </div>
+                              <div class="col-sm-2">
+                                <div class="form-group">
+                                  <label class="subopt">MIDI Channel</label>
+                                  <input type="number" class="is-valid form-control form-control-sm" name="midichannel" value="1">
+                                  <div class="invalid-feedback">Must be 1 - 16</div>
+                                </div>
+                              </div>
+                            </div>
+                        </div>
+
+                        <div class="subopt subopt-2" style="display: none; padding-bottom: 18px;">
+                            <div class="row justify-content-center">
+                              <div class="col-sm-2">
+                                <div class="form-group">
+                                  <label class="subopt">CC Number</label>
+                                  <input type="number" class="is-valid form-control form-control-sm" name="ccnumber" value="0">
+                                  <div class="invalid-feedback">Must be 0 - 127</div>
+                                </div>
+                              </div>
+                              <div class="col-sm-2">
+                                <div class="form-group">
+                                  <label class="subopt">CC Value</label>
+                                  <input type="number" class="is-valid form-control form-control-sm" name="ccvalue" value="0">
+                                  <div class="invalid-feedback">Must be 0 - 127</div>
+                                </div>
+                              </div>
+                              <div class="col-sm-2">
+                                <div class="form-group">
+                                  <label class="subopt">MIDI Channel</label>
+                                  <input type="number" class="is-valid form-control form-control-sm" name="midichannel" value="1">
+                                  <div class="invalid-feedback">Must be 1 - 16</div>
+                                </div>
+                              </div>
+                            </div>
+                        </div>
+
+                        <div class="subopt subopt-3" style="display: none; padding-bottom: 18px;">
+                            <div class="row justify-content-center">
+                              <div class="col-sm-2">
+                                <div class="form-group">
+                                  <label class="subopt">CC Number</label>
+                                  <input type="number" class="is-valid form-control form-control-sm" name="ccnumber" value="0">
+                                  <div class="invalid-feedback">Must be 0 - 127</div>
+                                </div>
+                              </div>
+                              <div class="col-sm-2">
+                                <div class="form-group">
+                                  <label class="subopt">CC Value</label>
+                                  <input type="number" class="is-valid form-control form-control-sm" name="ccvalue" value="0">
+                                  <div class="invalid-feedback">Must be 0 - 127</div>
+                                </div>
+                              </div>
+                              <div class="col-sm-2">
+                                <div class="form-group">
+                                  <label class="subopt">MIDI Channel</label>
+                                  <input type="number" class="is-valid form-control form-control-sm" name="midichannel" value="1">
+                                  <div class="invalid-feedback">Must be 1 - 16</div>
+                                </div>
+                              </div>
+                            </div>
+                        </div>
+
+                      </form>
+                    </div>
+
+
+
+                  </div>
+
+                </div>
+              </div>
             </div>
 
           </div>

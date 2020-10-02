@@ -69,11 +69,17 @@ function midiMessageReceived(midiMessage) {
 				$('#bank_number').text(bankNumber);
 				pageNumber = presetData.shift();
 				buttonNumber = presetData.shift();
+				$('#preset_number').prev().text('PRESET');
 				if (pageNumber == 1) {
 					$('#preset_number').text(presetsName[buttonNumber-1]);
 				} else {
 					$('#preset_number').text(presetsName[(buttonNumber-1)+n_presets]);
 				}
+				if (!midiMonitor) {
+					$('#edit-tab').tab('show');
+				}
+				
+				expNumber = undefined;
 
 				// Preset data
 				let presetConf = presetData.shift();
@@ -126,14 +132,9 @@ function midiMessageReceived(midiMessage) {
 				$('#lp_toggle_name').val(lpToggleName);
 
 				let colorVal = presetData.shift();
-				let ringColor = 0;
-				let colorType = 0;
-				if (colorVal >= 64) {
-					colorType = 1;
-					ringColor = colorVal-64;
-				} else {
-					ringColor = colorVal;
-				}
+				ringColor = parseInt('111111', 2)&colorVal;
+				colorType = (colorVal >> 6) & 0x01;
+
 				$('#color').val(ringColor);
 				$('label.color-label').eq(ringColor).trigger('click');
 				$('#color-type').val(colorType);
@@ -150,13 +151,15 @@ function midiMessageReceived(midiMessage) {
 					setMessagesData (i, action, type, pos, values);
 				}
 
-				$('#save_preset_button, #save_bank_button').prop('disabled', false);
+				$('#save_preset_button').prop('disabled', false);
+				expNumber = undefined;
 				
 				break;
 			// Bank Data
 			case 2:
 				bankName = intToAscii(presetData, 25);
 				$('#bank_name').val(bankName);
+				$('#save_bank_button').prop('disabled', false);
 				break;
 			// Settings Data
 			case 3:
@@ -167,6 +170,35 @@ function midiMessageReceived(midiMessage) {
 				$('select[name="ring-dim"]').val(presetData.shift());
 				$('select[name="omni-port-conf-1"]').val(presetData.shift());
 				$('select[name="omni-port-conf-2"]').val(presetData.shift());
+				break;
+			// Pedal Expression Data
+			case 8:
+				if (midiMonitor) {
+					return;
+				}
+				let bankNumberTemp = presetData.shift();
+				let expNumberTemp = presetData.shift();
+				if (expNumber != expNumberTemp) {
+					expNumber = expNumberTemp;
+					bankNumber = bankNumberTemp;
+					$('#bank_number').text(bankNumber);
+					$('#preset_number').prev().text('EXPRESSION');
+					$('#preset_number').text(expNumber+1);
+					$('#exp-pedal-tab').tab('show');
+					let shortName = intToAscii(presetData, 9);
+					$('#exp_short_name').val(shortName);
+					// Messages data
+					for(let i=0; i<n_messages; i++) {
+						let type = presetData.shift();
+						let values = [];
+						for(let j=0; j<n_values; j++) {
+							values[j] = presetData.shift();
+						}
+						setExpMessagesData(i, type, values);
+					}
+				}
+
+				$('#save_exp_button').prop('disabled', false);
 				break;
 		}
 	} else {
@@ -179,19 +211,22 @@ function midiMessageReceived(midiMessage) {
 				codeName = 'Control Change';
 				break;
 		}
-		let tiempo = new Date().toISOString();
+		let tiemp = new Date();
+		let tiempo = tiemp.toISOString();
+		let hour = tiemp.getHours();
 		let regex = /-/gi;
 		tiempo = tiempo.replace('T', ' ');
 		tiempo = tiempo.replace('Z', '');
 		tiempo = tiempo.replace(regex, '/');
-		
+		let tiempo1 = tiempo.slice(0,11);
+		let tiempo2 = tiempo.slice(13);
 		let data1 = presetData.shift();
 		let data2 = null;
 		if (presetData.length != 0) {
 			data2 = presetData.shift();
 		}
 		let trElement = $('<tr/>', {'class': 'table-dark'});
-		trElement.append($('<td/>', {'text': tiempo}));
+		trElement.append($('<td/>', {'text': tiempo1+hour+tiempo2}));
 		trElement.append($('<td/>', {'text': midiMessage.target.manufacturer}));
 		trElement.append($('<td/>', {'text': codeName}));
 		trElement.append($('<td/>', {'text': data1}));
@@ -219,6 +254,8 @@ function validateSubopt(elem)
 		case 'pcnumber':
 		case 'ccnumber':
 		case 'ccvalue':
+		case 'ccminvalue':
+		case 'ccmaxvalue':
 			validateRange (elem, 0, 127);
 			break;
 		case 'midichannel':
@@ -235,7 +272,11 @@ function validateRange (elem, min, max)
 		if (elem.hasClass('is-valid')) {
 			elem.removeClass('is-valid');
 			elem.addClass('is-invalid');
-			$('#save_preset_button').prop('disabled', true);
+			if (expNumber == undefined) {
+				$('#save_preset_button').prop('disabled', true);
+			} else {
+				$('#save_exp_button').prop('disabled', true);
+			}
 		}
 		
 	} else {
@@ -243,7 +284,11 @@ function validateRange (elem, min, max)
 			elem.removeClass('is-invalid');
 			elem.addClass('is-valid');
 			if ($('.is-invalid').length == 0) {
-				$('#save_preset_button').prop('disabled', false);
+				if (expNumber == undefined) {
+					$('#save_preset_button').prop('disabled', false);
+				} else {
+					$('#save_exp_button').prop('disabled', false);
+				}
 			}
 			
 		}
@@ -325,6 +370,14 @@ function setMessagesData (i, action, type, pos, values)
 	switchType(msg, type, values);
 }
 
+function setExpMessagesData (i, type, values)
+{
+	let msg = $('div.exp-msg').eq(i);
+	msg.find('select[name="exp-type"]').val(type);
+	checkExpSelect(msg.find('select[name="exp-type"]'));
+	switchExpType(msg, type, values);
+}
+
 function switchType(msg, type, values = [])
 {
 	msg.find('div.row').first().siblings().hide();
@@ -396,6 +449,45 @@ function switchType(msg, type, values = [])
 	}
 }
 
+function switchExpType(msg, type, values = [])
+{
+	msg.find('div.row').first().siblings().hide();
+	let div_subopt = msg.find('div.subopt-' + type);
+	div_subopt.show();
+
+	if (values.length == 0) {
+		return;
+	}
+
+	switch(String(type)) {
+		// Expression CC
+		case "1":
+			div_subopt.find('input[name="ccnumber"]').val(values[0]);
+			div_subopt.find('input[name="ccminvalue"]').val(values[1]);
+			div_subopt.find('input[name="ccmaxvalue"]').val(values[2]);
+			div_subopt.find('input[name="midichannel"]').val(values[3]);
+			break;
+		// CC Down
+		case "2":
+			div_subopt.find('input[name="ccnumber"]').val(values[0]);
+			div_subopt.find('input[name="ccvalue"]').val(values[1]);
+			div_subopt.find('input[name="midichannel"]').val(values[2]);
+			break;
+		// CC Up
+		case "3":
+			div_subopt.find('input[name="ccnumber"]').val(values[0]);
+			div_subopt.find('input[name="ccvalue"]').val(values[1]);
+			div_subopt.find('input[name="midichannel"]').val(values[2]);
+			break;
+		default:
+			div_subopt.find('input').each(function(index) {
+				$(this).val(values[index]);
+				validateSubopt($(this));
+			});
+			break;
+	}
+}
+
 function checkSelect(elem)
 {
 	if (elem.val() == '0') {
@@ -417,6 +509,35 @@ function checkMsgGreen(msg)
 	});
 
 	if (n_green == 2) {
+		msg.find('button').first().css({color: 'lawngreen'});
+		msg.addClass('msg-ok');
+	} else {
+		msg.find('button').first().css({color: 'white'});
+		msg.removeClass('msg-ok');
+	}
+}
+
+function checkExpSelect(elem)
+{
+	if (elem.val() == '0') {
+		elem.prev().find('span').css({color: 'white'});
+	} else {
+		elem.prev().find('span').css({color: 'lawngreen'});
+	}
+	checkExpMsgGreen(elem.closest('div.exp-msg'));
+}
+
+function checkExpMsgGreen(msg)
+{
+	elems = msg.find('span.input-group-text');
+	let n_green = 0;
+	elems.each(function() {
+		if ($(this).css('color') == 'rgb(124, 252, 0)') {
+			n_green++;
+		}
+	});
+
+	if (n_green == 1) {
 		msg.find('button').first().css({color: 'lawngreen'});
 		msg.addClass('msg-ok');
 	} else {
@@ -466,6 +587,8 @@ var incoming = [];
 var bankNumber;
 var pageNumber;
 var buttonNumber;
+var expNumber;
+var midiMonitor;
 
 $('#con_dis_button').on('click', function() {
 	if ($('#con_dis_button').hasClass('btn-primary')) {
@@ -499,20 +622,34 @@ $('.toggle-mode-button').on('click', function() {
 	}
 });
 
-$('#edit-tab').on('click', function() {
+$('#edit-tab').on('click', function(e) {
+	expNumber = undefined;
+	$('#preset_number').prev().text('PRESET');
+	if (pageNumber == 1) {
+		$('#preset_number').text(presetsName[buttonNumber-1]);
+	} else if (pageNumber == 2) {
+		$('#preset_number').text(presetsName[(buttonNumber-1)+n_presets]);
+	} else {
+		$('#bank_number').text('-');
+		$('#preset_number').text('-');
+	}
+	midiMonitor = undefined;
 	//sendPresetRequest();
 });
 
 $('#bank-tab').on('click', function() {
+	midiMonitor = undefined;
 	sendBankRequest();
 });
 
 $('#settings-tab').on('click', function() {
+	midiMonitor = undefined;
 	sendSettingsRequest();
 });
 
 $('#midi-monitor-tab').on('click', function() {
 	$('#midi-monitor-table').find('tbody').empty();
+	midiMonitor = true;
 	sendMIDIMonitorRequest();
 });
 
@@ -632,6 +769,60 @@ $('#save_preset_button').on('click', function() {
 	sendBytes(final_hex);
 });
 
+$('#save_exp_button').on('click', function() {
+	var final_hex = [];
+	final_hex.push(240);
+	final_hex.push(8);
+	final_hex.push(bankNumber);
+	final_hex.push(expNumber);
+
+	stringToAscii(final_hex, $('#exp_short_name').val(), 9);
+
+	$('div.exp-msg').each(function() {
+		if ($(this).hasClass('msg-ok')) {
+			let type = parseInt($(this).find('select[name="exp-type"]').val());
+			final_hex.push(type);
+
+			let div_subopt = $(this).find('div.subopt-' + type);
+			switch(String(type)) {
+				// Expression CC
+				case "1":
+					final_hex.push(parseInt(div_subopt.find('input[name="ccnumber"]').val()));
+					final_hex.push(parseInt(div_subopt.find('input[name="ccminvalue"]').val()));
+					final_hex.push(parseInt(div_subopt.find('input[name="ccmaxvalue"]').val()));
+					final_hex.push(parseInt(div_subopt.find('input[name="midichannel"]').val()));
+					break;
+				// CC Down
+				case "2":
+					final_hex.push(parseInt(div_subopt.find('input[name="ccnumber"]').val()));
+					final_hex.push(parseInt(div_subopt.find('input[name="ccvalue"]').val()));
+					final_hex.push(parseInt(div_subopt.find('input[name="midichannel"]').val()));
+					final_hex.push(0);
+					break;
+				// CC Up
+				case "3":
+					final_hex.push(parseInt(div_subopt.find('input[name="ccnumber"]').val()));
+					final_hex.push(parseInt(div_subopt.find('input[name="ccvalue"]').val()));
+					final_hex.push(parseInt(div_subopt.find('input[name="midichannel"]').val()));
+					final_hex.push(0);
+					break;
+				default:
+					for (let i=0; i < n_values; i++) {
+						final_hex.push(0);
+					}
+					break;
+			}
+		} else {
+			for (let i=0; i < (1 + n_values); i++) {
+				final_hex.push(0);
+			}
+		}
+	});
+
+	final_hex.push(247);
+	sendBytes(final_hex);
+});
+
 $('#save_bank_button').on('click', function() {
 	var final_hex = [];
 	final_hex.push(240);
@@ -660,8 +851,19 @@ $('#save_settings_button').on('click', function() {
 
 $(document).ready(function() {
 	$('[data-toggle="tooltip"]').tooltip();
-	let div_msg = $('div.msg')
+	// Preset Msg
+	let div_msg = $('div.msg');
 	let div_duplicate = div_msg.parent();
+
+	for (let i=0; i < (n_messages-1); i++) {
+		let div_clone = div_msg.clone()
+		div_clone.find('button').first().text('Msg ' + (i+2));
+		div_clone.appendTo(div_duplicate);
+	}
+
+	// Exp msg
+	div_msg = $('div.exp-msg');
+	div_duplicate = div_msg.parent();
 
 	for (let i=0; i < (n_messages-1); i++) {
 		let div_clone = div_msg.clone()
@@ -690,6 +892,11 @@ $(document).ready(function() {
 		checkSelect($(this));
 	});
 
+	$('select[name="exp-type"]').on('change', function() {
+		switchExpType($(this).closest('div.exp-msg'), $(this).val());
+		checkExpSelect($(this));
+	});
+
 	$('div.subopt').find('input').on('change', function() {
 		validateSubopt($(this));
 	});
@@ -703,6 +910,15 @@ $(document).ready(function() {
 		msg.find('span').css({color: 'white'});
 		msg.find('a.pos-button').data('pos', 0);
 		msg.find('a.pos-button').text('Pos: 1');
+	});
+
+	$('.exp-clear-button').on('click', function() {
+		let msg = $(this).closest('div.exp-msg');
+		msg.find('form')[0].reset();
+		msg.find('button').first().css({color: 'white'});
+		msg.removeClass('msg-ok');
+		msg.find('div.row').first().siblings().hide();
+		msg.find('span').css({color: 'white'});
 	});
 
 	$('a.pos-button').on('click', function() {
