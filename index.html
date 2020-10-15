@@ -63,7 +63,7 @@
               <a class="nav-link" id="settings-tab" data-toggle="tab" href="#settings-div" role="tab">Controller Settings</a>
             </li>
             <li class="nav-item">
-              <a class="nav-link disabled" href="#">Controller Backup</a>
+              <a class="nav-link" id="backup-tab" data-toggle="tab" href="#backup-div" role="tab">Controller Backup</a>
             </li>
             <li class="nav-item">
               <a class="nav-link" id="midi-monitor-tab" data-toggle="tab" href="#midi-monitor-div" role="tab">MIDI Monitor</a>
@@ -774,6 +774,46 @@
               </div>
             </div>
 
+            <!-- Controller Backup -->
+            <div class="tab-pane fade" role="tabpanel" id="backup-div" aria-labelledby="backup-tab" style="margin-top: 10px;">
+              <div class="row" style="margin-top:15px; margin-bottom: 32px;">
+                <div class="col-sm-12">
+                  <div class="card text-white bg-dark">
+                    <div class="card-body text-center" style="padding: 64px;">
+                        <h3>Download your controller presets</h3>
+                        <p>Back up your current bank or your entire controller into a .syx file.</p>
+                        <p>Your controller needs to be in Editor Mode first.</p>
+                        <button id="download_current_bank_button" class="btn btn-primary col-sm-3" data-toggle="tooltip" title="Save the current bank data to a .syx file" style="margin:5px">Current Bank</button>
+                        <button class="btn btn-primary col-sm-3" data-toggle="tooltip" title="Save the Controller data to a .syx file" style="margin:5px">All Banks</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="row" style="margin-bottom: 32px;">
+                <div class="col-sm-12">
+                  <div class="card text-white bg-dark">
+                    <div class="card-body text-center" style="padding: 64px;">
+                        <h3>Restore your controller presets</h3>
+                        <p>Select your backup .syx file and upload the presets into your controller</p>
+                        <div class="col-sm-8 offset-md-2">
+                            <form>
+                                <div class="input-group">
+                                  <div class="custom-file" style="text-align: left">
+                                    <input type="file" class="custom-file-input" id="restore_file"
+                                      aria-describedby="inputGroupFileAddon01">
+                                    <label class="custom-file-label" for="restore_file">Select .syx file</label>
+                                  </div>
+                                </div>
+                            </form>
+                        </div>
+                        <button id="restore_button" class="btn btn-primary col-sm-3" data-toggle="tooltip" title="Restore the current .syx file to controller" style="margin-top: 25px; display: none;">Restore File</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <!-- MIDI Monitor -->
             <div class="tab-pane fade" role="tabpanel" id="midi-monitor-div" aria-labelledby="midi-monitor-tab" style="margin-top: 10px;">
               <div class="row">
@@ -981,6 +1021,7 @@
     <script src="js/jquery.min.js"></script>
     <script src="js/popper.min.js"></script>
     <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="js/FileSaver.js"></script>
     <script src="js/teensy.js"></script>
   </body>
 </html>

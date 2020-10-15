@@ -56,6 +56,10 @@ function midiMessageReceived(midiMessage) {
 	let midiChannel = (allCode&15)+1;
 
 	if (code == 240) { // Initial Sysex code F0
+		if (!checkCRC(0,1,presetData)) {
+			alert('Datos no válidos');
+			return;
+		}
 		// Clear forms
 		$('div.msg').each(function() {
 			$(this).find('form')[0].reset();
@@ -172,7 +176,7 @@ function midiMessageReceived(midiMessage) {
 				$('select[name="omni-port-conf-2"]').val(presetData.shift());
 				break;
 			// Pedal Expression Data
-			case 8:
+			case 9:
 				if (midiMonitor) {
 					return;
 				}
@@ -200,7 +204,34 @@ function midiMessageReceived(midiMessage) {
 
 				$('#save_exp_button').prop('disabled', false);
 				break;
+			// Backup Current Bank Data
+			case 10:
+				let bankNumberBackup = presetData.shift();
+				presetData.pop(); // 247, End of SysEx
+				presetData.pop(); // Checksum
+				console.log(presetData);
+				presetData.unshift(240);
+				presetData.push(247);
+				let presetDataInt8 = new Uint8Array(presetData);
+				var blob = new Blob([presetDataInt8], {type: "application/octet-stream"});
+				saveAs(blob, "AfterMoon_MC8_Backup_file_Bank" + bankNumberBackup + ".syx");
+				break;
+			// Backup Restore Bank Data
+			case 11:
+				var final_hex = [];
+				let ra_cont = presetData.shift();
+
+				if (restore_array.length <= (200+ (200*ra_cont))) {
+					final_hex = restore_array.slice((200*ra_cont));
+				} else {
+					final_hex = restore_array.slice((200*ra_cont), 200+ (200*ra_cont));
+				}
+				
+				final_hex.unshift(ra_cont);
+				final_hex.unshift(11);
+				sendSysEx(final_hex);
 		}
+	// MIDI Monitor
 	} else {
 		let codeName = '';
 		switch(code) {
@@ -239,13 +270,38 @@ function midiMessageReceived(midiMessage) {
 	presetData.length = 0;
 }
 
+
+function checkCRC(inicio, final, datos) {
+	let copiaDatos = datos.slice(0);
+	for (let i = 0; i < inicio; i++) {
+		copiaDatos.shift();
+	}
+	for (let i = 0; i < final; i++) {
+		copiaDatos.pop();
+	}
+	var checksumOrigin = copiaDatos.pop();
+	var checksum = chk8xor(copiaDatos);
+	//console.log('Checksum Origin: ' + checksumOrigin);
+	//console.log('Checksum : ' + checksum);
+	return (checksumOrigin == checksum);
+}
+
+function chk8xor(byteArray) {
+	let checksum = 0x00;
+	for(let i = 0; i < byteArray.length; i++) {
+		checksum ^= byteArray[i];
+	}
+
+	return ~checksum&0x7F;
+}
+
 function onMIDIFailure() {
-    console.log('Could not access your MIDI devices.');
+	console.log('Could not access your MIDI devices.');
 }
 
 function PadLeft(value, length) {
-    return (value.toString().length < length) ? PadLeft("0" + value, length) : 
-    value;
+	return (value.toString().length < length) ? PadLeft("0" + value, length) : 
+	value;
 }
 
 function validateSubopt(elem)
@@ -296,10 +352,15 @@ function validateRange (elem, min, max)
 }
 
 // sends bytes to device
-function sendBytes(bytes)
+function sendSysEx(bytes)
 {
-    var bytes_to_send = new Uint8Array(bytes);
-    console.log(bytes_to_send);
+	let checksum = chk8xor(bytes);
+	bytes.unshift(240);
+	bytes.push(checksum);
+	bytes.push(247);
+
+	var bytes_to_send = new Uint8Array(bytes);
+	console.log(bytes_to_send);
 
 	midiOut.send(bytes_to_send);
 }
@@ -307,51 +368,41 @@ function sendBytes(bytes)
 function sendEditModeRequest()
 {
 	var final_hex = [];
-	final_hex.push(240);
 	final_hex.push(8);
 	final_hex.push(0);
-	final_hex.push(247);
-	sendBytes(final_hex);
+	sendSysEx(final_hex);
 }
 
 function sendPresetRequest()
 {
 	var final_hex = [];
-	final_hex.push(240);
 	final_hex.push(3);
 	final_hex.push(0);
-	final_hex.push(247);
-	sendBytes(final_hex);
+	sendSysEx(final_hex);
 }
 
 function sendBankRequest()
 {
 	var final_hex = [];
-	final_hex.push(240);
 	final_hex.push(4);
 	final_hex.push(0);
-	final_hex.push(247);
-	sendBytes(final_hex);
+	sendSysEx(final_hex);
 }
 
 function sendSettingsRequest()
 {
 	var final_hex = [];
-	final_hex.push(240);
 	final_hex.push(5);
 	final_hex.push(0);
-	final_hex.push(247);
-	sendBytes(final_hex);
+	sendSysEx(final_hex);
 }
 
 function sendMIDIMonitorRequest()
 {
 	var final_hex = [];
-	final_hex.push(240);
 	final_hex.push(7);
 	final_hex.push(0);
-	final_hex.push(247);
-	sendBytes(final_hex);
+	sendSysEx(final_hex);
 }
 
 function setMessagesData (i, action, type, pos, values)
@@ -583,6 +634,7 @@ var n_presets = 8;
 var n_banks = 12;
 var n_values = 4;
 var incoming = [];
+var restore_array = [];
 
 var bankNumber;
 var pageNumber;
@@ -661,7 +713,6 @@ $('label.color-label').on('click', function() {
 
 $('#save_preset_button').on('click', function() {
 	var final_hex = [];
-	final_hex.push(240);
 	final_hex.push(1);
 	final_hex.push(bankNumber);
 	final_hex.push(pageNumber);
@@ -765,14 +816,12 @@ $('#save_preset_button').on('click', function() {
 		}
 	});
 
-	final_hex.push(247);
-	sendBytes(final_hex);
+	sendSysEx(final_hex);
 });
 
 $('#save_exp_button').on('click', function() {
 	var final_hex = [];
-	final_hex.push(240);
-	final_hex.push(8);
+	final_hex.push(9);
 	final_hex.push(bankNumber);
 	final_hex.push(expNumber);
 
@@ -819,23 +868,20 @@ $('#save_exp_button').on('click', function() {
 		}
 	});
 
-	final_hex.push(247);
-	sendBytes(final_hex);
+	sendSysEx(final_hex);
 });
 
 $('#save_bank_button').on('click', function() {
 	var final_hex = [];
-	final_hex.push(240);
 	final_hex.push(2);
 	final_hex.push(bankNumber);
 	stringToAscii(final_hex, $('#bank_name').val(), 25);
-	final_hex.push(247);
-	sendBytes(final_hex);
+
+	sendSysEx(final_hex);
 });
 
 $('#save_settings_button').on('click', function() {
 	var final_hex = [];
-	final_hex.push(240);
 	final_hex.push(6);
 	final_hex.push($('select[name="debounce-time"]').val());
 	final_hex.push($('select[name="lp-time"]').val());
@@ -844,8 +890,53 @@ $('#save_settings_button').on('click', function() {
 	final_hex.push($('select[name="ring-dim"]').val());
 	final_hex.push($('select[name="omni-port-conf-1"]').val());
 	final_hex.push($('select[name="omni-port-conf-2"]').val());
-	final_hex.push(247);
-	sendBytes(final_hex);
+
+	sendSysEx(final_hex);
+});
+
+$('#download_current_bank_button').on('click', function() {
+	var final_hex = [];
+	final_hex.push(10);
+	final_hex.push(0);
+
+	sendSysEx(final_hex);
+});
+
+$('#restore_file').on('change', function(e) {
+	$('#restore_button').show();
+	$(this).siblings().first().text(e.target.files[0].name);
+});
+
+$('#restore_button').on('click', function(e) {
+	let reader = new FileReader();
+	reader.onload = function(e) {
+		let presetDataInt8 = new Uint8Array(e.target.result);
+		restore_array = [].slice.call(presetDataInt8);
+		restore_array.shift(); // 240 Shift Code
+		restore_array.pop(); // 247 Shift Code
+		var final_hex = [];
+		if (restore_array.length < 3000) {
+			let ra_cont = 0;
+			let ral = restore_array.length;
+			while (ral > 0) {
+				ral -= 200;
+				ra_cont += 1;
+			}
+
+			final_hex = restore_array.slice(0, 200);
+			final_hex.unshift(ra_cont);
+			final_hex.unshift(0);
+			final_hex.unshift(11);
+			sendSysEx(final_hex);
+			//console.log(final_hex);
+		} else {
+			// Restore All Banks
+		}
+		
+		//console.log(final_hex);
+
+	};
+	reader.readAsArrayBuffer($('#restore_file').prop('files')[0]);
 });
 
 
