@@ -83,8 +83,6 @@
               <!-- Preset Options -->
               <div class="row">
                 <div class="btn-group btn-group-justified col-sm-12">
-                  <button class="btn btn-secondary" id="preset_type_button" data-preset-type="0" data-toggle="tooltip" title="Preset type for led behavior. Type preset or effect" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); color: white;">Preset Type: Preset
-                  </button>
                   <button class="btn btn-secondary" data-toggle="tooltip" title="Copy the Preset" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Copy
                   </button>
                   <button class="btn btn-secondary" data-toggle="tooltip" title="Paste the last copied Preset to the current Preset" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Paste
@@ -98,65 +96,16 @@
 
               <!-- Preset Names -->
               <div class="row">
-                <div class="col-sm-12">
+                <div class="col-sm-6">
                   <div style="margin-top:15px;">
-                    <form>
-                    <div class="row">
-                        <div class="col-sm-6">
-                          <div class="form-group">
-                            <div class="input-group">
-                              <div class="input-group-prepend">
-                                <span class="input-group-text" data-toggle="tooltip" title="Preset Long Name">Long Name</span>
-                              </div>
-                              <input class="form-control input-sm" id="long_name" name="longName" type="text" maxlength="24" style="touch-action: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
-                            </div>
-                          </div>
+                    <div class="form-group">
+                      <div class="input-group">
+                        <div class="input-group-prepend">
+                          <span class="input-group-text" data-toggle="tooltip" title="Preset Long Name">Long Name</span>
                         </div>
+                        <input class="form-control input-sm" id="long_name" name="longName" type="text" maxlength="24" style="touch-action: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
                       </div>
-                      <div class="row">
-                        <div class="col-sm-8">
-                          <div class="form-group">
-                            <div class="input-group">
-                              <div  class="input-group-prepend">
-                                <span class="input-group-text" data-toggle="tooltip" title="Led ring color">Led Ring Color</span>
-                              </div>
-                              <input class="form-control" id="color" name="color" type="hidden" value="0">
-                              <div style="margin-left: 10px;">
-                                <label class="btn color-label" style="background-color: black; border-color: white;"></label>
-                                <label class="btn color-label" style="background-color: red"></label>
-                                <label class="btn color-label" style="background-color: orange"></label>
-                                <label class="btn color-label" style="background-color: yellow"></label>
-                                <label class="btn color-label" style="background-color: limegreen"></label>
-                                <label class="btn color-label" style="background-color: blue"></label>
-                                <label class="btn color-label" style="background-color: deepskyblue"></label>
-                                <label class="btn color-label" style="background-color: purple"></label>
-                                <label class="btn color-label" style="background-color: white"></label>
-                                <label class="btn color-label" style="background-color: hotpink"></label>
-                                <label class="btn color-label" style="background-color: darkcyan"></label>
-                                <label class="btn color-label" style="background-color: greenyellow"></label>
-                              </div>
-
-                            </div>
-                          </div>
-                        </div>
-                        
                     </div>
-                    <div class="row">
-                        <div class="col-sm-4">
-                          <div class="form-group">
-                            <div class="input-group">
-                              <div class="input-group-prepend">
-                                <span class="input-group-text" data-toggle="tooltip" title="Pos 1 Color Type">Pos 1 Color Type</span>
-                              </div>
-                              <select class="form-control input-sm" id="color-type">
-                                <option value="0"> Off </option>
-                                <option value="1"> Dimmer </option>
-                                </select>
-                            </div>
-                          </div>
-                        </div>
-                    </div>
-                    </form>
                   </div>
                 </div>
               </div>
@@ -172,6 +121,8 @@
                           <div class="card-body">
                             <div class="row" style="margin-bottom: 15px;">
                               <div class="btn-group btn-group-justified col-sm-12">
+                                <button class="btn btn-secondary" id="preset_type_button-sp" data-preset-type="0" data-toggle="tooltip" title="Preset type for led behavior. Type preset or noy" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); color: white;">Preset: No
+                                </button>
                                 <button class="btn btn-secondary toggle-mode-button" data-toggle-mode="0" data-toggle="tooltip" title="If Toggle Mode is On, each press will alternate between Pos 1 and 2" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); color: white;">Toggle Mode Off
                                 </button>
                                 <button class="btn btn-secondary" data-toggle="tooltip" title="Copy the Preset" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Copy
@@ -181,6 +132,48 @@
                                 <button class="btn btn-secondary" data-toggle="tooltip" title="Resets the Preset settings by double-clicking this button" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Clear
                                 </button>
                               </div>
+                            </div>
+                            <div class="row">
+                              <div class="col-sm-12">
+                                <div class="form-group">
+                                  <div class="input-group">
+                                    <div  class="input-group-prepend">
+                                      <span class="input-group-text" data-toggle="tooltip" title="Led ring color">Led Ring Color</span>
+                                    </div>
+                                    <input class="form-control" id="color-sp" name="color" type="hidden" value="0">
+                                    <div style="margin-top: 10px">
+                                      <label class="btn color-label" style="background-color: black; border-color: white;"></label>
+                                      <label class="btn color-label" style="background-color: red"></label>
+                                      <label class="btn color-label" style="background-color: orange"></label>
+                                      <label class="btn color-label" style="background-color: yellow"></label>
+                                      <label class="btn color-label" style="background-color: limegreen"></label>
+                                      <label class="btn color-label" style="background-color: blue"></label>
+                                      <label class="btn color-label" style="background-color: deepskyblue"></label>
+                                      <label class="btn color-label" style="background-color: purple"></label>
+                                      <label class="btn color-label" style="background-color: white"></label>
+                                      <label class="btn color-label" style="background-color: hotpink"></label>
+                                      <label class="btn color-label" style="background-color: darkcyan"></label>
+                                      <label class="btn color-label" style="background-color: greenyellow"></label>
+                                    </div>
+
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                  <div class="form-group">
+                                    <div class="input-group">
+                                      <div class="input-group-prepend">
+                                        <span class="input-group-text" data-toggle="tooltip" title="Pos 1 Color Type">Pos 1 Color Type</span>
+                                      </div>
+                                      <select class="form-control input-sm" id="color-type-sp">
+                                        <option value="0"> Off </option>
+                                        <option value="1"> Dimmer </option>
+                                        </select>
+                                    </div>
+                                  </div>
+                                </div>
                             </div>
                             <div class="form-group">
                               <div class="input-group">
@@ -207,6 +200,8 @@
                           <div class="card-body">
                             <div class="row" style="margin-bottom: 15px;">
                               <div class="btn-group btn-group-justified col-sm-12">
+                                <button class="btn btn-secondary" id="preset_type_button-lp" data-preset-type="0" data-toggle="tooltip" title="Preset type for led behavior. Type preset or not" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); color: white;">Preset: No
+                                </button>
                                 <button class="btn btn-secondary toggle-mode-button" data-toggle-mode="0" data-toggle="tooltip" title="If Toggle Mode is On, each press will alternate between Pos 1 and 2" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); color: white;">Toggle Mode Off
                                 </button>
                                 <button class="btn btn-secondary" data-toggle="tooltip" title="Copy the Preset" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Copy
@@ -216,6 +211,48 @@
                                 <button class="btn btn-secondary" data-toggle="tooltip" title="Resets the Preset settings by double-clicking this button" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Clear
                                 </button>
                               </div>
+                            </div>
+                            <div class="row">
+                              <div class="col-sm-12">
+                                <div class="form-group">
+                                  <div class="input-group">
+                                    <div  class="input-group-prepend">
+                                      <span class="input-group-text" data-toggle="tooltip" title="Led ring color">Led Ring Color</span>
+                                    </div>
+                                    <input class="form-control" id="color-lp" name="color" type="hidden" value="0">
+                                    <div style="margin-top: 10px">
+                                      <label class="btn color-label-lp" data-toggle="tooltip" title="Same color than Single Preset"  style="border-color: white;">sp</label>
+                                      <label class="btn color-label-lp" style="background-color: black"></label>
+                                      <label class="btn color-label-lp" style="background-color: red"></label>
+                                      <label class="btn color-label-lp" style="background-color: orange"></label>
+                                      <label class="btn color-label-lp" style="background-color: yellow"></label>
+                                      <label class="btn color-label-lp" style="background-color: limegreen"></label>
+                                      <label class="btn color-label-lp" style="background-color: blue"></label>
+                                      <label class="btn color-label-lp" style="background-color: deepskyblue"></label>
+                                      <label class="btn color-label-lp" style="background-color: purple"></label>
+                                      <label class="btn color-label-lp" style="background-color: white"></label>
+                                      <label class="btn color-label-lp" style="background-color: hotpink"></label>
+                                      <label class="btn color-label-lp" style="background-color: darkcyan"></label>
+                                      <label class="btn color-label-lp" style="background-color: greenyellow"></label>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-sm-12">
+                                  <div class="form-group">
+                                    <div class="input-group">
+                                      <div class="input-group-prepend">
+                                        <span class="input-group-text" data-toggle="tooltip" title="Pos 1 Color Type">Pos 1 Color Type</span>
+                                      </div>
+                                      <select class="form-control input-sm" id="color-type-lp">
+                                        <option value="0"> Off </option>
+                                        <option value="1"> Dimmer </option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                </div>
                             </div>
                             <div class="form-group">
                               <div class="input-group">
@@ -288,6 +325,11 @@
                                     <option value="4" hidden> Note Off </option>
                                     <option value="5" hidden> Real Time </option>
                                     <option value="6" disabled> SysEx </option>
+                                  </optgroup>
+                                  <optgroup label="Fractal FM3">
+                                    <option value="25"> Preset Change </option>
+                                    <option value="27"> Scene Change </option>
+                                    <option value="26"> Effect State Change </option>
                                   </optgroup>
                                   <optgroup label="Utility">
                                     <option value="7" hidden> Midi Clock </option>
@@ -418,6 +460,12 @@
                                     <option value="2"> Clear </option>
                                   </select>
                                 </div>
+                                <div class="form-group">
+                                  <label class="subopt">Bank Number</label>
+                                  <select class="form-control form-control-sm" name="toggle-bank-number">
+                                    <option value="0">Current Bank</option>
+                                  </select>
+                                </div>
                               </div>
                               <div class="col-sm-9" style="margin-top: 5px; margin-bottom: 10px">
                                 <div class="row">
@@ -540,6 +588,96 @@
                                     <option value="100"> 1000 </option>
                                     <option value="110"> 1100 </option>
                                     <option value="120"> 1200 </option>
+                                  </select>
+                                </div>
+                              </div>
+                            </div>
+                        </div>
+
+                        <div class="subopt subopt-25" style="display: none; padding-bottom: 18px;">
+                            <div class="row justify-content-center">
+                              <div class="col-sm-2">
+                                <div class="form-group">
+                                  <label class="subopt">PC Number</label>
+                                  <input type="number" class="is-valid form-control form-control-sm" name="pcnumber" value="0">
+                                  <div class="invalid-feedback">Must be 0 - 127</div>
+                                </div>
+                              </div>
+                              <div class="col-sm-2">
+                                <div class="form-group">
+                                  <label class="subopt">MIDI Channel</label>
+                                  <input type="number" class="is-valid form-control form-control-sm" name="midichannel" value="1">
+                                  <div class="invalid-feedback">Must be 1 - 16</div>
+                                </div>
+                              </div>
+                            </div>
+                        </div>
+
+                        <div class="subopt subopt-26" style="display: none; padding-bottom: 18px;">
+                            <div class="row justify-content-center">
+                              <div class="col-sm-3">
+                                <div class="form-group">
+                                  <label class="subopt">Effect</label>
+                                  <select class="form-control form-control-sm" name="effect">
+                                    <option value="6"> Amp 1 </option>
+                                    <option value="7"> Cab 1 </option>
+                                    <option value="12"> Chorus 1 </option>
+                                    <option value="13"> Chorus 2 </option>
+                                    <option value="0"> Compressor/Dynamics 1 </option>
+                                    <option value="1"> Compressor/Dynamics 2 </option>
+                                    <option value="9"> Delay 1 </option>
+                                    <option value="10"> Delay 2 </option>
+                                    <option value="33"> Drive 1 </option>
+                                    <option value="34"> Drive 2 </option>
+                                    <option value="35"> Enhancer 1 </option>
+                                    <option value="36"> Enhancer 2 </option>
+                                    <option value="54"> Feedback Return 1 </option>
+                                    <option value="55"> Feedback Return 2 </option>
+                                    <option value="52"> Feedback Send 1 </option>
+                                    <option value="53"> Feedback Send 2 </option>
+                                    <option value="29"> Filter 1 </option>
+                                    <option value="30"> Filter 2 </option>
+                                    <option value="31"> Filter 3 </option>
+                                    <option value="32"> Filter 4 </option>
+                                    <option value="14"> Flanger 1 </option>
+                                    <option value="15"> Flanger 2 </option>
+                                    <option value="22"> Formant 1 </option>
+                                    <option value="23"> Formant 2 </option>
+                                    <option value="43"> Gate/Expander 1 </option>
+                                    <option value="44"> Gate/Expander 2 </option>
+                                    <option value="2"> Graphic EQ 1 </option>
+                                    <option value="3"> Graphic EQ 2 </option>
+                                    <option value="50"> Looper 1 </option>
+                                    <option value="42"> Megatap Delay 1 </option>
+                                    <option value="56"> Midi 1 </option>
+                                    <option value="37"> Mixer 1 </option>
+                                    <option value="38"> Mixer 2 </option>
+                                    <option value="39"> Mixer 3 </option>
+                                    <option value="40"> Mixer 4 </option>
+                                    <option value="46"> Multiband Compressor 1 </option>
+                                    <option value="57"> Multiplexer 1 </option>
+                                    <option value="58"> Multiplexer 2 </option>
+                                    <option value="11"> Multitap Delay 1 </option>
+                                    <option value="4"> Parametric EQ 1 </option>
+                                    <option value="5"> Parametric EQ 2 </option>
+                                    <option value="18"> Phaser 1 </option>
+                                    <option value="19"> Phaser 2 </option>
+                                    <option value="28"> Pitch 1 </option>
+                                    <option value="51"> Plex Delay 1 </option>
+                                    <option value="48"> Resonator 1 </option>
+                                    <option value="49"> Resonator 2 </option>
+                                    <option value="8"> Reverb 1 </option>
+                                    <option value="45"> Ring Modulator 1 </option>
+                                    <option value="16"> Rotary 1 </option>
+                                    <option value="17"> Rotary 2 </option>
+                                    <option value="41"> Synth 1 </option>
+                                    <option value="47"> Ten-Tap Delay 1 </option>
+                                    <option value="26"> Tremolo/Panner 1 </option>
+                                    <option value="27"> Tremolo/Panner 2 </option>
+                                    <option value="24"> Volume/Pan 1 </option>
+                                    <option value="25"> Volume/Pan 2 </option>
+                                    <option value="20"> Wah 1 </option>
+                                    <option value="21"> Wah 2 </option>
                                   </select>
                                 </div>
                               </div>
@@ -738,6 +876,26 @@
                     </div>
                   </div>
                 </div>
+                <div class="col-sm-3">
+                  <div class="card text-white bg-dark border-light mb-3" style="max-width: 20rem;">
+                    <div class="card-body">
+                      <div class="form-group">
+                        <label class="subopt">Led All Bright</label>
+                        <select class="form-control input-sm" name="all-bright">
+                          <option value="0" selected>0</option>
+                          <option value="1">1</option>
+                          <option value="2">2</option>
+                          <option value="3">3</option>
+                          <option value="4">4</option>
+                          <option value="5">5</option>
+                          <option value="6">6</option>
+                          <option value="7">7</option>
+                          <option value="8">8</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               <div class="row" style="margin-top:15px;">
@@ -784,7 +942,7 @@
                         <p>Back up your current bank or your entire controller into a .syx file.</p>
                         <p>Your controller needs to be in Editor Mode first.</p>
                         <button id="download_current_bank_button" class="btn btn-primary col-sm-3" data-toggle="tooltip" title="Save the current bank data to a .syx file" style="margin:5px">Current Bank</button>
-                        <button class="btn btn-primary col-sm-3" data-toggle="tooltip" title="Save the Controller data to a .syx file" style="margin:5px">All Banks</button>
+                        <button id="download_all_banks_button" class="btn btn-primary col-sm-3" data-toggle="tooltip" title="Save the Controller data to a .syx file" style="margin:5px">All Banks</button>
                     </div>
                   </div>
                 </div>

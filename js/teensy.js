@@ -55,11 +55,24 @@ function midiMessageReceived(midiMessage) {
 	let code = allCode&240;
 	let midiChannel = (allCode&15)+1;
 
-	if (code == 240) { // Initial Sysex code F0
+	if (code == 240) { // Initial Sysex code 0xF0
+		presetData.unshift(240);
 		if (!checkCRC(0,1,presetData)) {
-			alert('Datos no válidos');
+			alert('Checksum no válido');
 			return;
 		}
+		presetData.shift();
+
+		// TODO Borrar hasta que el sysex se mande al FM3
+
+		if (presetData[0] == 0x00 && presetData[1] == 0x01 && presetData[2] == 0x74 && presetData[3] == 0x11 && presetData[4] == 0x13) {
+			var final_hex = [0x00, 0x01, 0x74, 0x11, 0x13, 37, 0, 65, 42, 0, 64, 46, 0, 65, 58, 0, 64, 62, 0, 66, 66, 0, 64, 70, 0, 64, 78, 0, 64, 82, 0, 65, 86, 0, 65, 94, 0, 65, 118, 0, 65, 2, 1, 64];
+			sendSysEx(final_hex);
+			return;
+		}
+
+		// TODO Borrar hasta aquí
+
 		// Clear forms
 		$('div.msg').each(function() {
 			$(this).find('form')[0].reset();
@@ -87,6 +100,8 @@ function midiMessageReceived(midiMessage) {
 
 				// Preset data
 				let presetConf = presetData.shift();
+				console.log(presetConf);
+				//return;
 				let pToggleMode = (presetConf >> 5) & 0x01;
 				let pToogleModeButton = $('.toggle-mode-button').eq(0);
 				if (pToggleMode == 0) {
@@ -113,15 +128,25 @@ function midiMessageReceived(midiMessage) {
 				} else {
 					pToogleModeButton.text('¡Error!');
 				}
-				let presetType = parseInt('11111', 2)&presetConf;
-				if (presetType == 0) {
-					$('#preset_type_button').data('preset-type', '0');
-					$('#preset_type_button').text('Preset Type: Preset');
-				} else if (presetType == 1) {
-					$('#preset_type_button').data('preset-type', '1');
-					$('#preset_type_button').text('Preset Type: Effect');
+				let spPresetType = (presetConf >> 0) & 0x01;
+				if (spPresetType == 0) {
+					$('#preset_type_button-sp').data('preset-type', '0');
+					$('#preset_type_button-sp').text('Preset: No');
+				} else if (spPresetType == 1) {
+					$('#preset_type_button-sp').data('preset-type', '1');
+					$('#preset_type_button-sp').text('Preset: Yes');
 				} else {
-					$('#preset_type_button').text('¡Error!');
+					$('#preset_type_button-sp').text('¡Error!');
+				}
+				let lpPresetType = (presetConf >> 1) & 0x01;
+				if (lpPresetType == 0) {
+					$('#preset_type_button-lp').data('preset-type', '0');
+					$('#preset_type_button-lp').text('Preset: No');
+				} else if (lpPresetType == 1) {
+					$('#preset_type_button-lp').data('preset-type', '1');
+					$('#preset_type_button-lp').text('Preset: Yes');
+				} else {
+					$('#preset_type_button-lp').text('¡Error!');
 				}
 				let longName = intToAscii(presetData, 25);
 				$('#long_name').val(longName);
@@ -135,13 +160,21 @@ function midiMessageReceived(midiMessage) {
 				let lpToggleName = intToAscii(presetData, 9);
 				$('#lp_toggle_name').val(lpToggleName);
 
-				let colorVal = presetData.shift();
-				ringColor = parseInt('111111', 2)&colorVal;
-				colorType = (colorVal >> 6) & 0x01;
+				let spColorVal = presetData.shift();
+				spRingColor = parseInt('111111', 2)&spColorVal;
+				spColorType = (spColorVal >> 6) & 0x01;
 
-				$('#color').val(ringColor);
-				$('label.color-label').eq(ringColor).trigger('click');
-				$('#color-type').val(colorType);
+				$('#color-sp').val(spRingColor);
+				$('label.color-label').eq(spRingColor).trigger('click');
+				$('#color-type-sp').val(spColorType);
+
+				let lpColorVal = presetData.shift();
+				lpRingColor = parseInt('111111', 2)&lpColorVal;
+				lpColorType = (lpColorVal >> 6) & 0x01;
+
+				$('#color-lp').val(lpRingColor);
+				$('label.color-label-lp').eq(lpRingColor).trigger('click');
+				$('#color-type-lp').val(lpColorType);
 
 				// Messages data
 				for(let i=0; i<n_messages; i++) {
@@ -172,6 +205,7 @@ function midiMessageReceived(midiMessage) {
 				$('select[name="notification-time"]').val(presetData.shift());
 				$('select[name="ring-bright"]').val(presetData.shift());
 				$('select[name="ring-dim"]').val(presetData.shift());
+				$('select[name="all-bright"]').val(presetData.shift());
 				$('select[name="omni-port-conf-1"]').val(presetData.shift());
 				$('select[name="omni-port-conf-2"]').val(presetData.shift());
 				break;
@@ -213,6 +247,10 @@ function midiMessageReceived(midiMessage) {
 				presetData.unshift(240);
 				presetData.push(247);
 				let presetDataInt8 = new Uint8Array(presetData);
+				if (presetDataInt8.length != (bank_length + 2)) {
+					alert('Datos no válidos');
+					return;
+				}
 				var blob = new Blob([presetDataInt8], {type: "application/octet-stream"});
 				saveAs(blob, "AfterMoon_MC8_Backup_file_Bank" + bankNumberBackup + ".syx");
 				break;
@@ -221,15 +259,64 @@ function midiMessageReceived(midiMessage) {
 				var final_hex = [];
 				let ra_cont = presetData.shift();
 
-				if (restore_array.length <= (200+ (200*ra_cont))) {
-					final_hex = restore_array.slice((200*ra_cont));
+				if (restore_array.length <= (file_div_size+ (file_div_size*ra_cont))) {
+					final_hex = restore_array.slice((file_div_size*ra_cont));
 				} else {
-					final_hex = restore_array.slice((200*ra_cont), 200+ (200*ra_cont));
+					final_hex = restore_array.slice((file_div_size*ra_cont), file_div_size+ (file_div_size*ra_cont));
 				}
 				
 				final_hex.unshift(ra_cont);
 				final_hex.unshift(11);
 				sendSysEx(final_hex);
+				break;
+			// Backup All Banks Data
+			case 12:
+				presetData.pop(); // 247, End of SysEx
+				presetData.pop(); // Checksum
+				console.log(presetData);
+				let bank_cont = presetData.shift();
+				if (bank_cont < n_banks) {
+					bank_rx_array = bank_rx_array.concat(presetData);
+					var final_hex = [];
+					final_hex.push(12);
+					final_hex.push(bank_cont + 1);
+
+					sendSysEx(final_hex);
+				} else {
+					
+					presetData.push(247);
+					bank_rx_array = bank_rx_array.concat(presetData);
+					let bankAllDataInt8 = new Uint8Array(bank_rx_array);
+					if (bankAllDataInt8.length != ((bank_length * n_banks) + 2)) {
+						alert('Datos no válidos');
+						return;
+					}
+					var blob = new Blob([bankAllDataInt8], {type: "application/octet-stream"});
+					saveAs(blob, "AfterMoon_MC8_Backup_file_All_Banks.syx");
+				}
+				break;
+			// Backup Restore All Banks Data First Time
+			case 13:
+				var final_hex = [];
+				all_banks_cont = 1;
+				final_hex = restore_array.slice((file_div_size*all_banks_cont), file_div_size + (file_div_size*all_banks_cont));
+
+				final_hex.unshift(14);
+				sendSysEx(final_hex);
+				break;
+			// Backup Restore All Banks Data X Times
+			case 14:
+				var final_hex = [];
+				all_banks_cont += 1;
+				if (restore_array.length <= (file_div_size + (file_div_size*all_banks_cont))) {
+					final_hex = restore_array.slice((file_div_size*all_banks_cont));
+				} else {
+					final_hex = restore_array.slice((file_div_size*all_banks_cont), file_div_size + (file_div_size*all_banks_cont));
+				}
+				
+				final_hex.unshift(14);
+				sendSysEx(final_hex);
+				break;
 		}
 	// MIDI Monitor
 	} else {
@@ -292,7 +379,7 @@ function chk8xor(byteArray) {
 		checksum ^= byteArray[i];
 	}
 
-	return ~checksum&0x7F;
+	return checksum&0x7F;
 }
 
 function onMIDIFailure() {
@@ -354,8 +441,8 @@ function validateRange (elem, min, max)
 // sends bytes to device
 function sendSysEx(bytes)
 {
-	let checksum = chk8xor(bytes);
 	bytes.unshift(240);
+	let checksum = chk8xor(bytes);
 	bytes.push(checksum);
 	bytes.push(247);
 
@@ -442,6 +529,7 @@ function switchType(msg, type, values = [])
 	switch(String(type)) {
 		// Program Change
 		case "1":
+		case "25":
 			div_subopt.find('input[name="pcnumber"]').val(values[0]);
 			div_subopt.find('input[name="midichannel"]').val(values[1]);
 			break;
@@ -464,7 +552,12 @@ function switchType(msg, type, values = [])
 		// Set Toggle Single / Long
 		case "15":
 		case "16":
-			div_subopt.find('select[name="toggle-position"]').val(values[0]);
+			let firstNum = values[0] & 3;
+			let secondNum = values[0] >> 2;
+			div_subopt.find('select[name="toggle-position"]').val(firstNum);
+			div_subopt.find('select[name="toggle-bank-number"]').val(secondNum);
+
+			// div_subopt.find('select[name="toggle-position"]').val(values[0]);
 			let num = values[1];
 			for (let i=0; i<7; i++) {
 				if (((num >> i) & 0x01) == 1) {
@@ -490,6 +583,10 @@ function switchType(msg, type, values = [])
 		// Delay
 		case "23":
 			div_subopt.find('select[name="delay"]').val(values[0]);
+			break;
+		// FM3 Effect
+		case "26":
+			div_subopt.find('select[name="effect"]').val(values[0]);
 			break;
 		default:
 			div_subopt.find('input').each(function(index) {
@@ -633,8 +730,12 @@ var n_messages = 8;
 var n_presets = 8;
 var n_banks = 12;
 var n_values = 4;
+var bank_length = 2043;
+var file_div_size = 200;
+var all_banks_cont = 0;
 var incoming = [];
 var restore_array = [];
+var bank_rx_array = [];
 
 var bankNumber;
 var pageNumber;
@@ -652,13 +753,13 @@ $('#con_dis_button').on('click', function() {
 	
 });
 
-$('#preset_type_button').on('click', function() {
+$('#preset_type_button-sp, #preset_type_button-lp').on('click', function() {
 	if ($(this).data('preset-type') == '0') {
 		$(this).data('preset-type', '1');
-		$(this).text('Preset Type: Effect');
+		$(this).text('Preset: Yes');
 	} else {
 		$(this).data('preset-type', '0');
-		$(this).text('Preset Type: Preset');
+		$(this).text('Preset: No');
 	}
 });
 
@@ -708,7 +809,13 @@ $('#midi-monitor-tab').on('click', function() {
 $('label.color-label').on('click', function() {
 	$('label.color-label').css({'border-color': 'transparent'});
 	$(this).css({'border-color': 'white'});
-	$('#color').val($(this).index());
+	$('#color-sp').val($(this).index());
+});
+
+$('label.color-label-lp').on('click', function() {
+	$('label.color-label-lp').css({'border-color': 'transparent'});
+	$(this).css({'border-color': 'white'});
+	$('#color-lp').val($(this).index());
 });
 
 $('#save_preset_button').on('click', function() {
@@ -717,7 +824,10 @@ $('#save_preset_button').on('click', function() {
 	final_hex.push(bankNumber);
 	final_hex.push(pageNumber);
 	final_hex.push(buttonNumber);
-	let presetConf = parseInt($('#preset_type_button').data('preset-type'));
+	let presetConf = parseInt($('#preset_type_button-sp').data('preset-type'));
+	if ($('#preset_type_button-lp').data('preset-type') == '1') {
+		presetConf |= 1 << 1;
+	}
 	if ($('.toggle-mode-button').eq(0).data('toggle-mode') == '1') {
 		presetConf |= 1 << 5;
 	}
@@ -730,8 +840,10 @@ $('#save_preset_button').on('click', function() {
 	stringToAscii(final_hex, $('#p_toggle_name').val(), 9);
 	stringToAscii(final_hex, $('#lp_short_name').val(), 9);
 	stringToAscii(final_hex, $('#lp_toggle_name').val(), 9);
-	let color_val = (parseInt($('#color').val()) + ($('#color-type').val()*64));
+	let color_val = (parseInt($('#color-sp').val()) + ($('#color-type-sp').val()*64));
 	final_hex.push(color_val);
+	let lp_color_val = (parseInt($('#color-lp').val()) + ($('#color-type-lp').val()*64));
+	final_hex.push(lp_color_val);
 	$('div.msg').each(function() {
 		if ($(this).hasClass('msg-ok')) {
 			final_hex.push(parseInt($(this).find('select[name="action"]').val()));
@@ -743,6 +855,7 @@ $('#save_preset_button').on('click', function() {
 			switch(String(type)) {
 				// Program Change
 				case "1":
+				case "25":
 					final_hex.push(parseInt(div_subopt.find('input[name="pcnumber"]').val()));
 					final_hex.push(parseInt(div_subopt.find('input[name="midichannel"]').val()));
 					final_hex.push(0);
@@ -773,7 +886,10 @@ $('#save_preset_button').on('click', function() {
 				// Set Toggle Single / Long
 				case "15":
 				case "16":
-					final_hex.push(parseInt(div_subopt.find('select[name="toggle-position"]').val()));
+					let firstNum = parseInt(div_subopt.find('select[name="toggle-position"]').val());
+					let secondNum = parseInt(div_subopt.find('select[name="toggle-bank-number"]').val()) << 2;
+					final_hex.push(firstNum + secondNum);
+
 					let num = 0;
 					for (let i=0; i<7; i++) {
 						if (div_subopt.find('input[name="inlineCheckbox'+i+'"]').val() == 1) {
@@ -799,6 +915,13 @@ $('#save_preset_button').on('click', function() {
 				// Delay
 				case "23":
 					final_hex.push(parseInt(div_subopt.find('select[name="delay"]').val()));
+					final_hex.push(0);
+					final_hex.push(0);
+					final_hex.push(0);
+					break;
+				// FM3 Effect
+				case "26":
+					final_hex.push(parseInt(div_subopt.find('select[name="effect"]').val()));
 					final_hex.push(0);
 					final_hex.push(0);
 					final_hex.push(0);
@@ -888,6 +1011,7 @@ $('#save_settings_button').on('click', function() {
 	final_hex.push($('select[name="notification-time"]').val());
 	final_hex.push($('select[name="ring-bright"]').val());
 	final_hex.push($('select[name="ring-dim"]').val());
+	final_hex.push($('select[name="all-bright"]').val());
 	final_hex.push($('select[name="omni-port-conf-1"]').val());
 	final_hex.push($('select[name="omni-port-conf-2"]').val());
 
@@ -898,6 +1022,16 @@ $('#download_current_bank_button').on('click', function() {
 	var final_hex = [];
 	final_hex.push(10);
 	final_hex.push(0);
+
+	sendSysEx(final_hex);
+});
+
+$('#download_all_banks_button').on('click', function() {
+	bank_rx_array = [];
+	bank_rx_array.push(240);
+	var final_hex = [];
+	final_hex.push(12);
+	final_hex.push(1);
 
 	sendSysEx(final_hex);
 });
@@ -919,11 +1053,11 @@ $('#restore_button').on('click', function(e) {
 			let ra_cont = 0;
 			let ral = restore_array.length;
 			while (ral > 0) {
-				ral -= 200;
+				ral -= file_div_size;
 				ra_cont += 1;
 			}
 
-			final_hex = restore_array.slice(0, 200);
+			final_hex = restore_array.slice(0, file_div_size);
 			final_hex.unshift(ra_cont);
 			final_hex.unshift(0);
 			final_hex.unshift(11);
@@ -931,6 +1065,10 @@ $('#restore_button').on('click', function(e) {
 			//console.log(final_hex);
 		} else {
 			// Restore All Banks
+			final_hex = restore_array.slice(0, file_div_size);
+			//final_hex.unshift(0);
+			final_hex.unshift(13);
+			sendSysEx(final_hex);
 		}
 		
 		//console.log(final_hex);
@@ -942,6 +1080,13 @@ $('#restore_button').on('click', function(e) {
 
 $(document).ready(function() {
 	$('[data-toggle="tooltip"]').tooltip();
+
+	// Set toggle Banks
+	let select_toggle = $('select[name="toggle-bank-number"]');
+	for (let i=1; i<=n_banks; i++) {
+		select_toggle.append($('<option/>', {'text': 'Bank ' + i, 'value': i}));
+	}
+
 	// Preset Msg
 	let div_msg = $('div.msg');
 	let div_duplicate = div_msg.parent();

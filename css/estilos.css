@@ -39,9 +39,9 @@ label.subopt {
 	text-align: center;
 }
 
-label.color-label {
+label.color-label, label.color-label-lp {
 	padding: 2px;
-	margin: 5px;
+	margin: 4px;
 	background-clip: content-box;
 	width: 26px;
 	height: 26px;
