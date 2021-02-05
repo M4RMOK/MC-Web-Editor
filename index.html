@@ -330,6 +330,7 @@
                                     <option value="25"> Preset Change </option>
                                     <option value="27"> Scene Change </option>
                                     <option value="26"> Effect State Change </option>
+                                    <option value="28"> Effect Channel Change </option>
                                   </optgroup>
                                   <optgroup label="Utility">
                                     <option value="7" hidden> Midi Clock </option>
@@ -684,6 +685,108 @@
                             </div>
                         </div>
 
+                        <div class="subopt subopt-27" style="display: none; padding-bottom: 18px;">
+                            <div class="row justify-content-center">
+                              <div class="col-sm-3">
+                                <div class="form-group">
+                                  <label class="subopt">Scene</label>
+                                  <select class="form-control form-control-sm" name="scene">
+                                    <option value="0"> Scene 1 </option>
+                                    <option value="1"> Scene 2 </option>
+                                    <option value="2"> Scene 3 </option>
+                                    <option value="3"> Scene 4 </option>
+                                    <option value="4"> Scene 5 </option>
+                                    <option value="5"> Scene 6 </option>
+                                    <option value="6"> Scene 7 </option>
+                                    <option value="7"> Scene 8 </option>
+                                  </select>
+                                </div>
+                              </div>
+                            </div>
+                        </div>
+
+                        <div class="subopt subopt-28" style="display: none; padding-bottom: 18px;">
+                            <div class="row justify-content-center">
+                              <div class="col-sm-3">
+                                <div class="form-group">
+                                  <label class="subopt">Effect</label>
+                                  <select class="form-control form-control-sm" name="effect">
+                                    <option value="6"> Amp 1 </option>
+                                    <option value="7"> Cab 1 </option>
+                                    <option value="12"> Chorus 1 </option>
+                                    <option value="13"> Chorus 2 </option>
+                                    <option value="0"> Compressor/Dynamics 1 </option>
+                                    <option value="1"> Compressor/Dynamics 2 </option>
+                                    <option value="9"> Delay 1 </option>
+                                    <option value="10"> Delay 2 </option>
+                                    <option value="33"> Drive 1 </option>
+                                    <option value="34"> Drive 2 </option>
+                                    <option value="35"> Enhancer 1 </option>
+                                    <option value="36"> Enhancer 2 </option>
+                                    <option value="54"> Feedback Return 1 </option>
+                                    <option value="55"> Feedback Return 2 </option>
+                                    <option value="52"> Feedback Send 1 </option>
+                                    <option value="53"> Feedback Send 2 </option>
+                                    <option value="29"> Filter 1 </option>
+                                    <option value="30"> Filter 2 </option>
+                                    <option value="31"> Filter 3 </option>
+                                    <option value="32"> Filter 4 </option>
+                                    <option value="14"> Flanger 1 </option>
+                                    <option value="15"> Flanger 2 </option>
+                                    <option value="22"> Formant 1 </option>
+                                    <option value="23"> Formant 2 </option>
+                                    <option value="43"> Gate/Expander 1 </option>
+                                    <option value="44"> Gate/Expander 2 </option>
+                                    <option value="2"> Graphic EQ 1 </option>
+                                    <option value="3"> Graphic EQ 2 </option>
+                                    <option value="50"> Looper 1 </option>
+                                    <option value="42"> Megatap Delay 1 </option>
+                                    <option value="56"> Midi 1 </option>
+                                    <option value="37"> Mixer 1 </option>
+                                    <option value="38"> Mixer 2 </option>
+                                    <option value="39"> Mixer 3 </option>
+                                    <option value="40"> Mixer 4 </option>
+                                    <option value="46"> Multiband Compressor 1 </option>
+                                    <option value="57"> Multiplexer 1 </option>
+                                    <option value="58"> Multiplexer 2 </option>
+                                    <option value="11"> Multitap Delay 1 </option>
+                                    <option value="4"> Parametric EQ 1 </option>
+                                    <option value="5"> Parametric EQ 2 </option>
+                                    <option value="18"> Phaser 1 </option>
+                                    <option value="19"> Phaser 2 </option>
+                                    <option value="28"> Pitch 1 </option>
+                                    <option value="51"> Plex Delay 1 </option>
+                                    <option value="48"> Resonator 1 </option>
+                                    <option value="49"> Resonator 2 </option>
+                                    <option value="8"> Reverb 1 </option>
+                                    <option value="45"> Ring Modulator 1 </option>
+                                    <option value="16"> Rotary 1 </option>
+                                    <option value="17"> Rotary 2 </option>
+                                    <option value="41"> Synth 1 </option>
+                                    <option value="47"> Ten-Tap Delay 1 </option>
+                                    <option value="26"> Tremolo/Panner 1 </option>
+                                    <option value="27"> Tremolo/Panner 2 </option>
+                                    <option value="24"> Volume/Pan 1 </option>
+                                    <option value="25"> Volume/Pan 2 </option>
+                                    <option value="20"> Wah 1 </option>
+                                    <option value="21"> Wah 2 </option>
+                                  </select>
+                                </div>
+                              </div>
+                              <div class="col-sm-3">
+                                <div class="form-group">
+                                  <label class="subopt">Channel</label>
+                                  <select class="form-control form-control-sm" name="channel">
+                                    <option value="0"> Channel A </option>
+                                    <option value="1"> Channel B </option>
+                                    <option value="2"> Channel C </option>
+                                    <option value="3"> Channel D </option>
+                                  </select>
+                                </div>
+                              </div>
+                            </div>
+                        </div>
+
                       </form>
                     </div>
 
@@ -720,6 +823,7 @@
                 </div>
               </div>
 
+              <!-- Times Settings -->
               <div class="row" style="margin-top:15px;">
                 <div class="col-sm-3">
                   <div class="card text-white bg-dark border-light mb-3" style="max-width: 20rem;">
@@ -826,6 +930,7 @@
                 </div>
               </div>
 
+              <!-- Leds Settings -->
               <div class="row" style="margin-top:15px;">
                 <div class="col-sm-3">
                   <div class="card text-white bg-dark border-light mb-3" style="max-width: 20rem;">
@@ -898,6 +1003,7 @@
                 </div>
               </div>
 
+              <!-- Omni Ports Settings -->
               <div class="row" style="margin-top:15px;">
                 <div class="col-sm-3">
                   <div class="card text-white bg-dark border-light mb-3" style="max-width: 20rem;">
@@ -929,8 +1035,22 @@
                     </div>
                   </div>
                 </div>
+                <div class="col-sm-3">
+                  <div class="card text-white bg-dark border-light mb-3" style="max-width: 20rem;">
+                    <div class="card-body">
+                      <div class="form-group">
+                        <label class="subopt">Request Fm3 Scenes</label>
+                        <select class="form-control input-sm" name="req-fm3-scenes">
+                          <option value="0" selected>No</option>
+                          <option value="1">Yes</option>
+                        </select>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
             </div>
+
 
             <!-- Controller Backup -->
             <div class="tab-pane fade" role="tabpanel" id="backup-div" aria-labelledby="backup-tab" style="margin-top: 10px;">

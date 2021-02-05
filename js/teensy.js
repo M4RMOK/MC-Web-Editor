@@ -65,11 +65,46 @@ function midiMessageReceived(midiMessage) {
 
 		// TODO Borrar hasta que el sysex se mande al FM3
 
-		if (presetData[0] == 0x00 && presetData[1] == 0x01 && presetData[2] == 0x74 && presetData[3] == 0x11 && presetData[4] == 0x13) {
-			var final_hex = [0x00, 0x01, 0x74, 0x11, 0x13, 37, 0, 65, 42, 0, 64, 46, 0, 65, 58, 0, 64, 62, 0, 66, 66, 0, 64, 70, 0, 64, 78, 0, 64, 82, 0, 65, 86, 0, 65, 94, 0, 65, 118, 0, 65, 2, 1, 64];
-			sendSysEx(final_hex);
+		if (presetData[0] == 0x00 && presetData[1] == 0x01 && presetData[2] == 0x74 && presetData[3] == 0x11) {
+			switch (presetData[4]) {
+				// All effects status request
+				case 0x13:
+					var final_hex = [0x00, 0x01, 0x74, 0x11, 0x13, 37, 0, 65, 42, 0, 64, 46, 0, 65, 58, 0, 64, 62, 0, 66, 66, 0, 64, 70, 0, 64, 78, 0, 68, 82, 0, 65, 86, 0, 65, 94, 0, 65, 118, 0, 65, 2, 1, 64];
+					sendSysEx(final_hex);
+					break;
+				// All effects status request
+				case 0x0E:
+				var sceneActual = 2;
+					var final_hex = [0x00, 0x01, 0x74, 0x11, 0x0E];
+					if (presetData[5] == 127) {
+						final_hex.push(sceneActual);
+					} else {
+						final_hex.push(presetData[5]);
+					}
+					final_hex.push(69);
+					final_hex.push(115);
+					final_hex.push(99);
+					final_hex.push(101);
+					final_hex.push(110);
+					final_hex.push(97);
+					final_hex.push(32);
+					if (presetData[5] == 127) {
+						final_hex.push(sceneActual + 49);
+					} else {
+						final_hex.push(presetData[5] + 49);
+					}
+					for (j=0;j<24;j++) {
+						final_hex.push(32);
+					}
+
+					
+					sendSysEx(final_hex);
+					break;
+			}
 			return;
 		}
+		console.log('aqui');
+
 
 		// TODO Borrar hasta aquí
 
@@ -100,7 +135,7 @@ function midiMessageReceived(midiMessage) {
 
 				// Preset data
 				let presetConf = presetData.shift();
-				console.log(presetConf);
+				//console.log(presetConf);
 				//return;
 				let pToggleMode = (presetConf >> 5) & 0x01;
 				let pToogleModeButton = $('.toggle-mode-button').eq(0);
@@ -208,6 +243,7 @@ function midiMessageReceived(midiMessage) {
 				$('select[name="all-bright"]').val(presetData.shift());
 				$('select[name="omni-port-conf-1"]').val(presetData.shift());
 				$('select[name="omni-port-conf-2"]').val(presetData.shift());
+				$('select[name="req-fm3-scenes"]').val(presetData.shift());
 				break;
 			// Pedal Expression Data
 			case 9:
@@ -588,6 +624,15 @@ function switchType(msg, type, values = [])
 		case "26":
 			div_subopt.find('select[name="effect"]').val(values[0]);
 			break;
+		// FM3 Scene
+		case "27":
+			div_subopt.find('select[name="scene"]').val(values[0]);
+			break;
+		// FM3 Channel
+		case "28":
+			div_subopt.find('select[name="effect"]').val(values[0]);
+			div_subopt.find('select[name="channel"]').val(values[1]);
+			break;
 		default:
 			div_subopt.find('input').each(function(index) {
 				$(this).val(values[index]);
@@ -926,6 +971,20 @@ $('#save_preset_button').on('click', function() {
 					final_hex.push(0);
 					final_hex.push(0);
 					break;
+				// FM3 Scene
+				case "27":
+					final_hex.push(parseInt(div_subopt.find('select[name="scene"]').val()));
+					final_hex.push(0);
+					final_hex.push(0);
+					final_hex.push(0);
+					break;
+				// FM3 Channel
+				case "28":
+					final_hex.push(parseInt(div_subopt.find('select[name="effect"]').val()));
+					final_hex.push(parseInt(div_subopt.find('select[name="channel"]').val()));
+					final_hex.push(0);
+					final_hex.push(0);
+					break;
 				default:
 					for (let i=0; i < n_values; i++) {
 						final_hex.push(0);
@@ -1014,6 +1073,7 @@ $('#save_settings_button').on('click', function() {
 	final_hex.push($('select[name="all-bright"]').val());
 	final_hex.push($('select[name="omni-port-conf-1"]').val());
 	final_hex.push($('select[name="omni-port-conf-2"]').val());
+	final_hex.push($('select[name="req-fm3-scenes"]').val());
 
 	sendSysEx(final_hex);
 });
