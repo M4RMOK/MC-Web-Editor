@@ -72,7 +72,7 @@ function midiMessageReceived(midiMessage) {
 					var final_hex = [0x00, 0x01, 0x74, 0x11, 0x13, 37, 0, 65, 42, 0, 64, 46, 0, 65, 58, 0, 64, 62, 0, 66, 66, 0, 64, 70, 0, 64, 78, 0, 68, 82, 0, 65, 86, 0, 65, 94, 0, 65, 118, 0, 65, 2, 1, 64];
 					sendSysEx(final_hex);
 					break;
-				// All effects status request
+				// All Scene request
 				case 0x0E:
 				var sceneActual = 2;
 					var final_hex = [0x00, 0x01, 0x74, 0x11, 0x0E];
@@ -103,9 +103,6 @@ function midiMessageReceived(midiMessage) {
 			}
 			return;
 		}
-		console.log('aqui');
-
-
 		// TODO Borrar hasta aquí
 
 		// Clear forms
@@ -442,6 +439,10 @@ function validateSubopt(elem)
 			break;
 		case 'bank-number':
 			validateRange (elem, 1, n_banks);
+			break;
+		case 'fm3pcnumber':
+			validateRange (elem, 0, 511);
+			break;
 	}
 }
 
@@ -565,7 +566,6 @@ function switchType(msg, type, values = [])
 	switch(String(type)) {
 		// Program Change
 		case "1":
-		case "25":
 			div_subopt.find('input[name="pcnumber"]').val(values[0]);
 			div_subopt.find('input[name="midichannel"]').val(values[1]);
 			break;
@@ -619,6 +619,13 @@ function switchType(msg, type, values = [])
 		// Delay
 		case "23":
 			div_subopt.find('select[name="delay"]').val(values[0]);
+			break;
+		// FM3 Preset Change
+		case "25":
+			let fm3IDSec = values[1];
+			let fm3ID = (fm3IDSec << 7) + values[0];
+			div_subopt.find('input[name="fm3pcnumber"]').val(fm3ID);
+			div_subopt.find('input[name="midichannel"]').val(values[2]);
 			break;
 		// FM3 Effect
 		case "26":
@@ -900,7 +907,6 @@ $('#save_preset_button').on('click', function() {
 			switch(String(type)) {
 				// Program Change
 				case "1":
-				case "25":
 					final_hex.push(parseInt(div_subopt.find('input[name="pcnumber"]').val()));
 					final_hex.push(parseInt(div_subopt.find('input[name="midichannel"]').val()));
 					final_hex.push(0);
@@ -964,6 +970,14 @@ $('#save_preset_button').on('click', function() {
 					final_hex.push(0);
 					final_hex.push(0);
 					break;
+				// FM3 Preset Change
+				case "25":
+					let fm3PCID = parseInt(div_subopt.find('input[name="fm3pcnumber"]').val());
+					final_hex.push(fm3PCID&0x7F);
+					final_hex.push(fm3PCID >> 7);
+					final_hex.push(parseInt(div_subopt.find('input[name="midichannel"]').val()));
+					final_hex.push(0);
+					break;
 				// FM3 Effect
 				case "26":
 					final_hex.push(parseInt(div_subopt.find('select[name="effect"]').val()));
@@ -997,7 +1011,6 @@ $('#save_preset_button').on('click', function() {
 			}
 		}
 	});
-
 	sendSysEx(final_hex);
 });
 
