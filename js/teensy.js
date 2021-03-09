@@ -10,6 +10,13 @@ function connect() {
         alert("No MIDI support present in your browser.");
 }
 
+function disconnect() {
+    var final_hex = [];
+	final_hex.push(19);
+	final_hex.push(0);
+	sendSysEx(final_hex);
+}
+
 function onMIDISuccess(midi) {
    // Reset.
     midiIn = null;
@@ -40,8 +47,9 @@ function onMIDISuccess(midi) {
         $('#con_dis_button').removeClass('btn-primary');
         $('#con_dis_button').addClass('btn-success');
         $('#con_dis_button').text('Teensy MIDI');
+        isConnected = true;
         sendEditModeRequest();
-        //sendPresetRequest();
+        sendPresetRequest();
     } else {
         alert("No Teensy MIDI found.");
     }
@@ -49,6 +57,9 @@ function onMIDISuccess(midi) {
 
 
 function midiMessageReceived(midiMessage) {
+	if (!isConnected) {
+		return;
+	}
 	console.log(midiMessage);
 	presetData = [].slice.call(midiMessage.data);
 	let allCode = presetData.shift();
@@ -62,48 +73,6 @@ function midiMessageReceived(midiMessage) {
 			return;
 		}
 		presetData.shift();
-
-		// TODO Borrar hasta que el sysex se mande al FM3
-
-		if (presetData[0] == 0x00 && presetData[1] == 0x01 && presetData[2] == 0x74 && presetData[3] == 0x11) {
-			switch (presetData[4]) {
-				// All effects status request
-				case 0x13:
-					var final_hex = [0x00, 0x01, 0x74, 0x11, 0x13, 37, 0, 65, 42, 0, 64, 46, 0, 65, 58, 0, 64, 62, 0, 66, 66, 0, 64, 70, 0, 64, 78, 0, 68, 82, 0, 65, 86, 0, 65, 94, 0, 65, 118, 0, 65, 2, 1, 64];
-					sendSysEx(final_hex);
-					break;
-				// All Scene request
-				case 0x0E:
-				var sceneActual = 2;
-					var final_hex = [0x00, 0x01, 0x74, 0x11, 0x0E];
-					if (presetData[5] == 127) {
-						final_hex.push(sceneActual);
-					} else {
-						final_hex.push(presetData[5]);
-					}
-					final_hex.push(69);
-					final_hex.push(115);
-					final_hex.push(99);
-					final_hex.push(101);
-					final_hex.push(110);
-					final_hex.push(97);
-					final_hex.push(32);
-					if (presetData[5] == 127) {
-						final_hex.push(sceneActual + 49);
-					} else {
-						final_hex.push(presetData[5] + 49);
-					}
-					for (j=0;j<24;j++) {
-						final_hex.push(32);
-					}
-
-					
-					sendSysEx(final_hex);
-					break;
-			}
-			return;
-		}
-		// TODO Borrar hasta aquí
 
 		// Clear forms
 		$('div.msg').each(function() {
@@ -119,11 +88,8 @@ function midiMessageReceived(midiMessage) {
 				pageNumber = presetData.shift();
 				buttonNumber = presetData.shift();
 				$('#preset_number').prev().text('PRESET');
-				if (pageNumber == 1) {
-					$('#preset_number').text(presetsName[buttonNumber-1]);
-				} else {
-					$('#preset_number').text(presetsName[(buttonNumber-1)+n_presets]);
-				}
+				$('#page_number').text(pageNumber);
+				$('#preset_number').text(presetsName[buttonNumber-1]);
 				if (!midiMonitor) {
 					$('#edit-tab').tab('show');
 				}
@@ -478,6 +444,9 @@ function validateRange (elem, min, max)
 // sends bytes to device
 function sendSysEx(bytes)
 {
+	if (!isConnected) {
+		return;
+	}
 	bytes.unshift(240);
 	let checksum = chk8xor(bytes);
 	bytes.push(checksum);
@@ -525,6 +494,30 @@ function sendMIDIMonitorRequest()
 {
 	var final_hex = [];
 	final_hex.push(7);
+	final_hex.push(0);
+	sendSysEx(final_hex);
+}
+
+function sendTogglePage()
+{
+	var final_hex = [];
+	final_hex.push(16);
+	final_hex.push(0);
+	sendSysEx(final_hex);
+}
+
+function sendBankDown()
+{
+	var final_hex = [];
+	final_hex.push(17);
+	final_hex.push(0);
+	sendSysEx(final_hex);
+}
+
+function sendBankUp()
+{
+	var final_hex = [];
+	final_hex.push(18);
 	final_hex.push(0);
 	sendSysEx(final_hex);
 }
@@ -775,12 +768,12 @@ function stringToAscii(arr, str, numChars)
 // ******** Main *********
 // ***********************
 
-var presetsName = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P'];
+var presetsName = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H'];
 var midiAccess=null;
 
 var n_messages = 8;
 var n_presets = 8;
-var n_banks = 12;
+var n_banks = 20;
 var n_values = 4;
 var bank_length = 2043;
 var file_div_size = 200;
@@ -794,13 +787,17 @@ var pageNumber;
 var buttonNumber;
 var expNumber;
 var midiMonitor;
+var isConnected = false;
 
 $('#con_dis_button').on('click', function() {
 	if ($('#con_dis_button').hasClass('btn-primary')) {
 		connect();
 	} else {
+		disconnect();
+		isConnected = false;
         $('#con_dis_button').removeClass('btn-success');
         $('#con_dis_button').addClass('btn-primary');
+        $('#con_dis_button').text('Click to connect');
 	}
 	
 });
@@ -830,12 +827,12 @@ $('.toggle-mode-button').on('click', function() {
 $('#edit-tab').on('click', function(e) {
 	expNumber = undefined;
 	$('#preset_number').prev().text('PRESET');
-	if (pageNumber == 1) {
+	if (pageNumber == 1 || pageNumber == 2) {
+		$('#page_number').text(pageNumber);
 		$('#preset_number').text(presetsName[buttonNumber-1]);
-	} else if (pageNumber == 2) {
-		$('#preset_number').text(presetsName[(buttonNumber-1)+n_presets]);
 	} else {
 		$('#bank_number').text('-');
+		$('#page_number').text('-');
 		$('#preset_number').text('-');
 	}
 	midiMonitor = undefined;
@@ -856,6 +853,18 @@ $('#midi-monitor-tab').on('click', function() {
 	$('#midi-monitor-table').find('tbody').empty();
 	midiMonitor = true;
 	sendMIDIMonitorRequest();
+});
+
+$('#toggle_page_button').on('click', function() {
+	sendTogglePage();
+});
+
+$('#bank_down_button').on('click', function() {
+	sendBankDown();
+});
+
+$('#bank_up_button').on('click', function() {
+	sendBankUp();
 });
 
 $('label.color-label').on('click', function() {
