@@ -19,6 +19,7 @@ function disconnect() {
 
 function onMIDISuccess(midi) {
    // Reset.
+   console.log(midi.inputs.values());
     midiIn = null;
     midiOut = null;
     midiAccess = midi;
@@ -28,6 +29,7 @@ function onMIDISuccess(midi) {
 
     // MIDI devices that send you data.
     for (var input of midiAccess.inputs.values()) {
+    	console.log(input);
         if (input.name == 'Teensy MIDI') {
             midiIn = input;
             midiInputOk = true;
@@ -73,6 +75,11 @@ function midiMessageReceived(midiMessage) {
 			return;
 		}
 		presetData.shift();
+		if (presetData[0] == 0x00 && presetData[1] == 0x01 && presetData[2] == 0x74 && presetData[3] == 0x11) {
+			showMidiMonitor(midiMessage, midiChannel, code, presetData);
+			presetData.length = 0;
+			return;
+		}
 
 		// Clear forms
 		$('div.msg').each(function() {
@@ -126,25 +133,31 @@ function midiMessageReceived(midiMessage) {
 				} else {
 					pToogleModeButton.text('¡Error!');
 				}
-				let spPresetType = (presetConf >> 0) & 0x01;
+				let spPresetType = presetConf & 0x03;
 				if (spPresetType == 0) {
-					$('#preset_type_button-sp').data('preset-type', '0');
-					$('#preset_type_button-sp').text('Preset: No');
+					$('#preset_type_button_sp').data('preset-type', '0');
+					$('#preset_type_button_sp').text('Type: Normal');
 				} else if (spPresetType == 1) {
-					$('#preset_type_button-sp').data('preset-type', '1');
-					$('#preset_type_button-sp').text('Preset: Yes');
+					$('#preset_type_button_sp').data('preset-type', '1');
+					$('#preset_type_button_sp').text('Type: Preset');
+				} else if (spPresetType == 2) {
+					$('#preset_type_button_sp').data('preset-type', '2');
+					$('#preset_type_button_sp').text('Type: Tempo');
 				} else {
-					$('#preset_type_button-sp').text('¡Error!');
+					$('#preset_type_button_sp').text('¡Error!');
 				}
-				let lpPresetType = (presetConf >> 1) & 0x01;
+				let lpPresetType = (presetConf >> 2) & 0x03;
 				if (lpPresetType == 0) {
-					$('#preset_type_button-lp').data('preset-type', '0');
-					$('#preset_type_button-lp').text('Preset: No');
+					$('#preset_type_button_lp').data('preset-type', '0');
+					$('#preset_type_button_lp').text('Type: Normal');
 				} else if (lpPresetType == 1) {
-					$('#preset_type_button-lp').data('preset-type', '1');
-					$('#preset_type_button-lp').text('Preset: Yes');
+					$('#preset_type_button_lp').data('preset-type', '1');
+					$('#preset_type_button_lp').text('Type: Preset');
+				} else if (spPresetType == 2) {
+					$('#preset_type_button_lp').data('preset-type', '2');
+					$('#preset_type_button_lp').text('Type: Tempo');
 				} else {
-					$('#preset_type_button-lp').text('¡Error!');
+					$('#preset_type_button_lp').text('¡Error!');
 				}
 				let longName = intToAscii(presetData, 25);
 				$('#long_name').val(longName);
@@ -319,7 +332,85 @@ function midiMessageReceived(midiMessage) {
 		}
 	// MIDI Monitor
 	} else {
-		let codeName = '';
+		showMidiMonitor(midiMessage, midiChannel, code, presetData);
+	}
+	
+	presetData.length = 0;
+}
+
+function showMidiMonitor(midiMessage, midiChannel, code, presetData) {
+	let codeName = '';
+	let data1 = '-';
+	let data2 = '-';
+	if (presetData[0] == 0x00 && presetData[1] == 0x01 && presetData[2] == 0x74 && presetData[3] == 0x11) {
+		midiChannel = '-';
+		switch(presetData[4]) {
+			case 0x0A:
+				if (presetData[7] == 0x7F) {
+					codeName = 'FM3 Get Bypass';
+				} else {
+					codeName = 'FM3 Set Bypass';
+					data1 = presetData[5];
+					data2 = presetData[6];
+					midiChannel = presetData[7];
+				}
+				break;
+			case 0x0B:
+				if (presetData[7] == 0x7F) {
+					codeName = 'FM3 Get Channel';
+				} else {
+					codeName = 'FM3 Set Channel';
+					data1 = presetData[5];
+					data2 = presetData[6];
+					midiChannel = presetData[7];
+				}
+				break;
+			case 0x0C:
+				if (presetData[5] == 0x7F) {
+					codeName = 'FM3 Get Scene';
+				} else {
+					codeName = 'FM3 Set Scene';
+					data1 = presetData[5];
+				}
+				break;
+			case 0x0D:
+				codeName = 'FM3 Query Patch Name';
+				data1 = presetData[5];
+				data2 = presetData[6];
+				break;
+			case 0x0E:
+				codeName = 'FM3 Query Scene Name';
+				data1 = presetData[5];
+				break;
+			case 0x0F:
+				if (presetData[5] == 0x7F) {
+					codeName = 'FM3 Get Looper State';
+				} else {
+					codeName = 'FM3 Set Looper State';
+					data1 = presetData[5];
+				}
+				break;
+			case 0x10:
+				codeName = 'FM3 Tap Tempo';
+				break;
+			case 0x11:
+				codeName = 'FM3 Tuner';
+				data1 = presetData[5];
+				break;
+			case 0x13:
+				codeName = 'FM3 Status Dump';
+				break;
+			case 0x14:
+				if (presetData[5] == 0x7F && presetData[6] == 0x7F) {
+					codeName = 'FM3 Get Tempo';
+				} else {
+					codeName = 'FM3 Set Tempo';
+					data1 = presetData[5];
+					data2 = presetData[6];
+				}
+				break;
+		}
+	} else {
 		switch(code) {
 			case 192:
 				codeName = 'Program Change';
@@ -328,32 +419,35 @@ function midiMessageReceived(midiMessage) {
 				codeName = 'Control Change';
 				break;
 		}
-		let tiemp = new Date();
-		let tiempo = tiemp.toISOString();
-		let hour = tiemp.getHours();
-		let regex = /-/gi;
-		tiempo = tiempo.replace('T', ' ');
-		tiempo = tiempo.replace('Z', '');
-		tiempo = tiempo.replace(regex, '/');
-		let tiempo1 = tiempo.slice(0,11);
-		let tiempo2 = tiempo.slice(13);
-		let data1 = presetData.shift();
-		let data2 = null;
+		data1 = presetData.shift();
 		if (presetData.length != 0) {
 			data2 = presetData.shift();
 		}
-		let trElement = $('<tr/>', {'class': 'table-dark'});
-		trElement.append($('<td/>', {'text': tiempo1+hour+tiempo2}));
-		trElement.append($('<td/>', {'text': midiMessage.target.manufacturer}));
-		trElement.append($('<td/>', {'text': codeName}));
-		trElement.append($('<td/>', {'text': data1}));
-		trElement.append($('<td/>', {'text': data2}));
-		trElement.append($('<td/>', {'text': midiChannel}));
+	}
 
-		$('#midi-monitor-table').find('tbody').prepend(trElement);
+	if (codeName == '') {
+		return;
 	}
 	
-	presetData.length = 0;
+	let tiemp = new Date();
+	let tiempo = tiemp.toISOString();
+	let hour = tiemp.getHours();
+	let regex = /-/gi;
+	tiempo = tiempo.replace('T', ' ');
+	tiempo = tiempo.replace('Z', '');
+	tiempo = tiempo.replace(regex, '/');
+	let tiempo1 = tiempo.slice(0,11);
+	let tiempo2 = tiempo.slice(13);
+	
+	let trElement = $('<tr/>', {'class': 'table-dark'});
+	trElement.append($('<td/>', {'text': tiempo1+hour+tiempo2}));
+	trElement.append($('<td/>', {'text': midiMessage.target.manufacturer}));
+	trElement.append($('<td/>', {'text': codeName}));
+	trElement.append($('<td/>', {'text': data1}));
+	trElement.append($('<td/>', {'text': data2}));
+	trElement.append($('<td/>', {'text': midiChannel}));
+
+	$('#midi-monitor-table').find('tbody').prepend(trElement);
 }
 
 
@@ -408,6 +502,9 @@ function validateSubopt(elem)
 			break;
 		case 'fm3pcnumber':
 			validateRange (elem, 0, 511);
+			break;
+		case 'bpm':
+			validateRange (elem, 24, 250);
 			break;
 	}
 }
@@ -568,6 +665,12 @@ function switchType(msg, type, values = [])
 			div_subopt.find('input[name="ccvalue"]').val(values[1]);
 			div_subopt.find('input[name="midichannel"]').val(values[2]);
 			break;
+		// Midi Clock
+		case "7":
+			let BPMSec = values[1];
+			let BPM = (BPMSec << 7) + values[0];
+			div_subopt.find('input[name="bpm"]').val(BPM);
+			break;
 		// Bank Up / Down
 		case "10":
 		case "11":
@@ -575,7 +678,16 @@ function switchType(msg, type, values = [])
 			break;
 		// Bank Jump
 		case "13":
-			div_subopt.find('input[name="bank-number"]').val(values[0]);
+			if(values[0] == 127) {
+				div_subopt.find('select[name="last-used-bank"]').val(1);
+				div_subopt.find('input[name="bank-number"]').parent().parent().css({visibility: 'hidden'});
+				div_subopt.find('input[name="bank-number"]').value = '1';
+
+			} else {
+				div_subopt.find('select[name="last-used-bank"]').val(0);
+				div_subopt.find('input[name="bank-number"]').parent().parent().css({visibility: 'visible'});
+				div_subopt.find('input[name="bank-number"]').val(values[0]);
+			}
 			div_subopt.find('select[name="page"]').val(values[1]);
 			break;
 		// Set Toggle Single / Long
@@ -608,6 +720,10 @@ function switchType(msg, type, values = [])
 					div_subopt.find('input[name="inlineCheckbox'+i+'"]').prop('checked', true);
 				}
 			}
+			break;
+		// FM3 Tuner
+		case "21":
+			div_subopt.find('select[name="fm3-tuner"]').val(values[0]);
 			break;
 		// Delay
 		case "23":
@@ -802,13 +918,19 @@ $('#con_dis_button').on('click', function() {
 	
 });
 
-$('#preset_type_button-sp, #preset_type_button-lp').on('click', function() {
-	if ($(this).data('preset-type') == '0') {
-		$(this).data('preset-type', '1');
-		$(this).text('Preset: Yes');
-	} else {
-		$(this).data('preset-type', '0');
-		$(this).text('Preset: No');
+$('#preset_type_button_sp, #preset_type_button_lp').on('click', function() {
+	switch($(this).data('preset-type').toString()) {
+		case '0':
+			$(this).data('preset-type', '1');
+			$(this).text('Type: Preset');
+			break;
+		case '1':
+			$(this).data('preset-type', '2');
+			$(this).text('Type: Tempo');
+			break;
+		default:
+			$(this).data('preset-type', '0');
+			$(this).text('Type: Normal');
 	}
 });
 
@@ -885,10 +1007,8 @@ $('#save_preset_button').on('click', function() {
 	final_hex.push(bankNumber);
 	final_hex.push(pageNumber);
 	final_hex.push(buttonNumber);
-	let presetConf = parseInt($('#preset_type_button-sp').data('preset-type'));
-	if ($('#preset_type_button-lp').data('preset-type') == '1') {
-		presetConf |= 1 << 1;
-	}
+	let presetConf = parseInt($('#preset_type_button_sp').data('preset-type'));
+	presetConf |= $('#preset_type_button_lp').data('preset-type') << 2;
 	if ($('.toggle-mode-button').eq(0).data('toggle-mode') == '1') {
 		presetConf |= 1 << 5;
 	}
@@ -928,6 +1048,14 @@ $('#save_preset_button').on('click', function() {
 					final_hex.push(parseInt(div_subopt.find('input[name="midichannel"]').val()));
 					final_hex.push(0);
 					break;
+				// Midi Clock
+				case "7":
+					let BPMID = parseInt(div_subopt.find('input[name="bpm"]').val());
+					final_hex.push(BPMID&0x7F);
+					final_hex.push(BPMID >> 7);
+					final_hex.push(0);
+					final_hex.push(0);
+					break;
 				// Bank Up / Down
 				case "10":
 				case "11":
@@ -938,7 +1066,11 @@ $('#save_preset_button').on('click', function() {
 					break;
 				// Bank Jump
 				case "13":
-					final_hex.push(parseInt(div_subopt.find('input[name="bank-number"]').val()));
+					if (div_subopt.find('select[name="last-used-bank"]').val() == '1') {
+						final_hex.push(127);
+					} else {
+						final_hex.push(parseInt(div_subopt.find('input[name="bank-number"]').val()));
+					}
 					final_hex.push(parseInt(div_subopt.find('select[name="page"]').val()));
 					final_hex.push(0);
 					final_hex.push(0);
@@ -971,6 +1103,13 @@ $('#save_preset_button').on('click', function() {
 						}
 					}
 					final_hex.push(num);
+					break;
+				// FM3 Tuner
+				case "21":
+					final_hex.push(parseInt(div_subopt.find('select[name="fm3-tuner"]').val()));
+					final_hex.push(0);
+					final_hex.push(0);
+					final_hex.push(0);
 					break;
 				// Delay
 				case "23":
@@ -1020,6 +1159,7 @@ $('#save_preset_button').on('click', function() {
 			}
 		}
 	});
+
 	sendSysEx(final_hex);
 });
 
@@ -1257,7 +1397,16 @@ $(document).ready(function() {
 				$(this).text('Pos: 1');
 				break;
 		}
-		
+	});
+
+	$('select[name="last-used-bank"]').on('change', function() {
+		if ($(this).val() == 1) {
+			$(this).parent().parent().next().css({visibility: 'hidden'});
+			$(this).parent().parent().next().find('input[name="bank-number"]')[0].value = '1';
+			validateSubopt($($(this).parent().parent().next().find('input[name="bank-number"]')[0]));
+		} else {
+			$(this).parent().parent().next().css({visibility: 'visible'});
+		}
 	});
 
 	//searchTeensy();

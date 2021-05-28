@@ -10,7 +10,7 @@
     <div class="container-fluid">
       <div style="margin:5px; vertical-align:middle;">
 
-        <div class="container">
+        <div class="container" style="max-width: 1600px;">
           <div class="row">
             <div class="col-sm-4" style="margin-top:5px;">
               <div class="row">
@@ -39,7 +39,7 @@
           </div>
         </div>
 
-        <div class="container">
+        <div class="container" style="max-width: 1600px;">
           <div class="row">
             <div class="col-sm-4">
               <button id="con_dis_button" class="btn col-sm-12 btn-primary" data-toggle="tooltip" title="Connect or disconnect your device" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); color: black;"> Click to connect </button>
@@ -54,7 +54,7 @@
         </div>
 
 
-        <div class="container" style="margin-top: 10px;">
+        <div class="container" style="margin-top: 10px; max-width: 1600px;">
           <!-- Menu -->
           <ul class="nav nav-tabs" id="myTab" role="tablist">
             <li class="nav-item">
@@ -93,7 +93,7 @@
                   </button>
                   <button class="btn btn-secondary" data-toggle="tooltip" title="Resets the Preset settings by double-clicking this button" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Clear
                   </button>
-                  <button class="btn btn-secondary" id="save_preset_button" data-toggle="tooltip" title="Save Preset settings to the device" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);" disabled>Save Preset
+                  <button class="btn btn-secondary" id="save_preset_button" data-toggle="tooltip" title="Save Preset settings to the device" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);" >Save Preset
                   </button>
                 </div>
               </div>
@@ -125,7 +125,7 @@
                           <div class="card-body">
                             <div class="row" style="margin-bottom: 15px;">
                               <div class="btn-group btn-group-justified col-sm-12">
-                                <button class="btn btn-secondary" id="preset_type_button-sp" data-preset-type="0" data-toggle="tooltip" title="Preset type for led behavior. Type preset or noy" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); color: white;">Preset: No
+                                <button class="btn btn-secondary" id="preset_type_button_sp" data-preset-type="0" data-toggle="tooltip" title="Preset type for behavior. Type normal, preset or tempo" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); color: white;">Type: Normal
                                 </button>
                                 <button class="btn btn-secondary toggle-mode-button" data-toggle-mode="0" data-toggle="tooltip" title="If Toggle Mode is On, each press will alternate between Pos 1 and 2" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); color: white;">Toggle Mode Off
                                 </button>
@@ -204,7 +204,7 @@
                           <div class="card-body">
                             <div class="row" style="margin-bottom: 15px;">
                               <div class="btn-group btn-group-justified col-sm-12">
-                                <button class="btn btn-secondary" id="preset_type_button-lp" data-preset-type="0" data-toggle="tooltip" title="Preset type for led behavior. Type preset or not" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); color: white;">Preset: No
+                                <button class="btn btn-secondary" id="preset_type_button_lp" data-preset-type="0" data-toggle="tooltip" title="Preset type for behavior. Type normal, preset or tempo" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); color: white;">Type: Normal
                                 </button>
                                 <button class="btn btn-secondary toggle-mode-button" data-toggle-mode="0" data-toggle="tooltip" title="If Toggle Mode is On, each press will alternate between Pos 1 and 2" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); color: white;">Toggle Mode Off
                                 </button>
@@ -335,10 +335,11 @@
                                     <option value="27"> Scene Change </option>
                                     <option value="26"> Effect State Change </option>
                                     <option value="28"> Effect Channel Change </option>
+                                    <option value="21"> Tuner </option>
                                   </optgroup>
                                   <optgroup label="Utility">
-                                    <option value="7" hidden> Midi Clock </option>
-                                    <option value="24" disabled> Midi Clock Tap </option>
+                                    <option value="7"> Midi Clock </option>
+                                    <option value="24"> Midi Clock Tap </option>
                                     <option value="8" hidden> PC Scroll Up </option>
                                     <option value="9" hidden> PC Scroll Down </option>
                                   </optgroup>
@@ -354,9 +355,6 @@
                                     <option value="17" disabled> Select Exp Message </option>
                                     <option value="18" hidden> Looper Mode </option>
                                     <option value="23"> Delay </option>
-                                  </optgroup>
-                                  <optgroup label="Other Devices">
-                                    <option value="21" disabled> AxeFX Tuner </option>
                                   </optgroup>
                                 </select>
                               </div>
@@ -419,6 +417,18 @@
                             </div>
                         </div>
 
+                        <div class="subopt subopt-7" style="display: none; padding-bottom: 18px;">
+                            <div class="row justify-content-center">
+                              <div class="col-sm-2">
+                                <div class="form-group">
+                                  <label class="subopt">BPM</label>
+                                  <input type="number" class="is-valid form-control form-control-sm" name="bpm" value="120">
+                                  <div class="invalid-feedback">Must be 24 - 250</div>
+                                </div>
+                              </div>
+                            </div>
+                        </div>
+
                         <div class="subopt subopt-10 subopt-11" style="display: none; padding-bottom: 18px;">
                             <div class="row justify-content-center">
                               <div class="col-sm-2">
@@ -437,9 +447,18 @@
                             <div class="row justify-content-center">
                               <div class="col-sm-2">
                                 <div class="form-group">
+                                  <label class="subopt">Last used bank</label>
+                                  <select class="form-control form-control-sm" name="last-used-bank">
+                                    <option value="0"> No </option>
+                                    <option value="1"> Yes </option>
+                                  </select>
+                                </div>
+                              </div>
+                              <div class="col-sm-2">
+                                <div class="form-group">
                                   <label class="subopt">Bank Number</label>
                                   <input type="number" class="is-valid form-control form-control-sm" name="bank-number" value="1">
-                                  <div class="invalid-feedback">Must be 1 - 12</div>
+                                  <div class="invalid-feedback">Must be 1 - 20</div>
                                 </div>
                               </div>
                               <div class="col-sm-2">
@@ -569,6 +588,20 @@
                                         </div>
                                       </div>
                                     </div>
+                                </div>
+                              </div>
+                            </div>
+                        </div>
+
+                        <div class="subopt subopt-21" style="display: none; padding-bottom: 18px;">
+                            <div class="row justify-content-center">
+                              <div class="col-sm-2">
+                                <div class="form-group">
+                                  <label class="subopt">State</label>
+                                  <select class="form-control form-control-sm" name="fm3-tuner">
+                                    <option value="0"> Off </option>
+                                    <option value="1"> On </option>
+                                  </select>
                                 </div>
                               </div>
                             </div>
@@ -1111,7 +1144,7 @@
                                 <th scope="col">Midi Type</th>
                                 <th scope="col">Data 1</th>
                                 <th scope="col">Data 2</th>
-                                <th scope="col">Channel</th>
+                                <th scope="col">Channel / Data 3</th>
                             </tr>
                         </thead>
                         <tbody></tbody>
