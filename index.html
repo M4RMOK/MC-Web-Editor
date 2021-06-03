@@ -87,11 +87,11 @@
               <!-- Preset Options -->
               <div class="row">
                 <div class="btn-group btn-group-justified col-sm-12">
-                  <button class="btn btn-secondary" data-toggle="tooltip" title="Copy the Preset" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Copy
+                  <button class="btn btn-secondary disabled" data-toggle="tooltip" title="Copy the Preset" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Copy
                   </button>
-                  <button class="btn btn-secondary" data-toggle="tooltip" title="Paste the last copied Preset to the current Preset" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Paste
+                  <button class="btn btn-secondary disabled" data-toggle="tooltip" title="Paste the last copied Preset to the current Preset" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Paste
                   </button>
-                  <button class="btn btn-secondary" data-toggle="tooltip" title="Resets the Preset settings by double-clicking this button" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Clear
+                  <button class="btn btn-secondary disabled" data-toggle="tooltip" title="Resets the Preset settings by double-clicking this button" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Clear
                   </button>
                   <button class="btn btn-secondary" id="save_preset_button" data-toggle="tooltip" title="Save Preset settings to the device" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);" >Save Preset
                   </button>
@@ -129,11 +129,11 @@
                                 </button>
                                 <button class="btn btn-secondary toggle-mode-button" data-toggle-mode="0" data-toggle="tooltip" title="If Toggle Mode is On, each press will alternate between Pos 1 and 2" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0); color: white;">Toggle Mode Off
                                 </button>
-                                <button class="btn btn-secondary" data-toggle="tooltip" title="Copy the Preset" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Copy
+                                <button class="btn btn-secondary disabled" data-toggle="tooltip" title="Copy the Preset" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Copy
                                 </button>
-                                <button class="btn btn-secondary" data-toggle="tooltip" title="Paste the last copied Preset to the current Preset" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Paste
+                                <button class="btn btn-secondary disabled" data-toggle="tooltip" title="Paste the last copied Preset to the current Preset" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Paste
                                 </button>
-                                <button class="btn btn-secondary" data-toggle="tooltip" title="Resets the Preset settings by double-clicking this button" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Clear
+                                <button class="btn btn-secondary disabled" data-toggle="tooltip" title="Resets the Preset settings by double-clicking this button" type="button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Clear
                                 </button>
                               </div>
                             </div>
@@ -365,8 +365,8 @@
                               <div class="btn-group btn-group-justified col-sm-12">
                                 <a class="btn btn-secondary pos-button" data-pos="0" data-toggle="tooltip" title="Selects the toggle position for this message. If set to Pos 1, the message will only be executed when the Preset is in Toggle Position 1." style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Pos: 1</a>
                                 <a class="btn btn-secondary clear-button" data-toggle="tooltip" title="Clears the message settings with a double-click on this button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Clear</a>
-                                <a class="btn btn-secondary copy-button disabled" data-toggle="tooltip" title="Copy this message" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Copy</a>
-                                <a class="btn btn-secondary paste-button disabled" data-toggle="tooltip" title="Paste the last copied message to this message" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Paste</a>
+                                <a class="btn btn-secondary copy-button" data-toggle="tooltip" title="Copy this message" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Copy</a>
+                                <a class="btn btn-secondary paste-button" data-toggle="tooltip" title="Paste the last copied message to this message" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Paste</a>
                               </div>
                             </div>
                           </div>
@@ -1225,8 +1225,8 @@
                             <div class="row">
                               <div class="btn-group btn-group-justified col-sm-12">
                                 <a class="btn btn-secondary exp-clear-button" data-toggle="tooltip" title="Clears the message settings with a double-click on this button" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Clear</a>
-                                <a class="btn btn-secondary copy-button disabled" data-toggle="tooltip" title="Copy this message" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Copy</a>
-                                <a class="btn btn-secondary paste-button disabled" data-toggle="tooltip" title="Paste the last copied message to this message" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Paste</a>
+                                <a class="btn btn-secondary exp-copy-button disabled" data-toggle="tooltip" title="Copy this message" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Copy</a>
+                                <a class="btn btn-secondary exp-paste-button disabled" data-toggle="tooltip" title="Paste the last copied message to this message" style="touch-action: none; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Paste</a>
                               </div>
                             </div>
                           </div>

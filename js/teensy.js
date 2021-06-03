@@ -905,6 +905,8 @@ var expNumber;
 var midiMonitor;
 var isConnected = false;
 
+var myCopy;
+
 $('#con_dis_button').on('click', function() {
 	if ($('#con_dis_button').hasClass('btn-primary')) {
 		connect();
@@ -1357,6 +1359,24 @@ $(document).ready(function() {
 
 	$('div.subopt').find('input').on('change', function() {
 		validateSubopt($(this));
+	});
+
+	$('.copy-button').on('click', function() {
+		myCopy = $(this).closest('div.msg');
+	});
+
+	$('.paste-button').on('click', function() {
+		if (myCopy == undefined) {
+			return;
+		}
+		let msg = $(this).closest('div.msg');
+		let myCopyClone = myCopy.clone();
+		myCopy.find('select').each(function(i) {
+			myCopyClone.find('select').eq(i).val($(this).val())
+		})
+		let msgNumber = msg.find('button').first().text();
+		myCopyClone.find('button').first().text(msgNumber);
+		msg.replaceWith(myCopyClone);
 	});
 
 	$('.clear-button').on('click', function() {
